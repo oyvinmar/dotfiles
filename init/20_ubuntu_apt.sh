@@ -31,7 +31,7 @@ apt_packages+=(
   htop
   sl
   vim
-  zsh-completions
+  zsh
   thefuck
 )
 
