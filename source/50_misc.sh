@@ -4,6 +4,6 @@ alias grep='grep --color=auto'
 export LESS=-XR
 
 # "fuck"
-if [[ "$(which thefuck)" ]]; then
-  eval $(thefuck --alias)
-fi
+# if [[ "$(which thefuck)" ]]; then
+#   eval $(thefuck --alias)
+# fi
