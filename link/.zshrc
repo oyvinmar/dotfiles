@@ -115,6 +115,12 @@ setopt INC_APPEND_HISTORY
 
 # Where the magic happens.
 # export DOTFILES=~/.dotfiles
+# o
+
+export VOLTA_HOME="$HOME/.volta"
+[ -s "$VOLTA_HOME/load.sh" ] && . "$VOLTA_HOME/load.sh"
+
+export PATH="$VOLTA_HOME/bin:$PATH"
 
 # Source all .zsh files
 for file ($DOTFILES/source/*.zsh); do
@@ -139,3 +145,4 @@ function dotfiles() {
 }
 
 src
+
