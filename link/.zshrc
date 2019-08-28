@@ -1,6 +1,9 @@
+export DOTFILES=~/.dotfiles
+
 #
 # fpath
 #
+fpath=($DOTFILES/zfunctions $fpath)
 
 # As per `brew info zsh-completions`
 # if is_osx; then
@@ -25,9 +28,8 @@ bindkey '^[[Z' reverse-menu-complete
 # Prompt theme
 # https://github.com/sindresorhus/pure
 #
-# autoload -U promptinit
-# promptinit
-# prompt pure
+autoload -U promptinit; promptinit
+prompt pure
 
 #
 # Word style: directory delimiter
@@ -112,7 +114,7 @@ setopt INC_APPEND_HISTORY
 # setopt SHARE_HISTORY
 
 # Where the magic happens.
-export DOTFILES=~/.dotfiles
+# export DOTFILES=~/.dotfiles
 
 # Source all files in "source"
 function src() {
