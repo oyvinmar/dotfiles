@@ -29,5 +29,4 @@ setopt prompt_subst
 
 [[ -n "$WINDOW" ]] && SCREEN_NO="%B$WINDOW%b " || SCREEN_NO=""
 
-# Apply theming defaults
-PS1="%n@%m:%~%# "
+
