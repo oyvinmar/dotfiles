@@ -48,7 +48,7 @@ compinit
 
 # case insensitive (all), partial-word and substring completion
 # https://github.com/robbyrussell/oh-my-zsh/blob/e8aba1bf5912f89f408eaebd1bc74c25ba32a62c/lib/completion.zsh#L23
-zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
+# zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
 
 # Menu selection
 # http://www.masterzen.fr/2009/04/19/in-love-with-zsh-part-one/
@@ -115,6 +115,11 @@ setopt INC_APPEND_HISTORY
 
 # Where the magic happens.
 # export DOTFILES=~/.dotfiles
+
+# Source all .zsh files
+for file ($DOTFILES/source/*.zsh); do
+  source $file
+done
 
 # Source all files in "source"
 function src() {
