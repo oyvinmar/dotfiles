@@ -14,6 +14,7 @@ recipes=(
   thefuck
   tmux
   wget
+  ruby
 )
 
 brew_install_recipes
