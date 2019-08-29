@@ -1,3 +1,11 @@
+#
+# Completion
+# https://github.com/robbyrussell/oh-my-zsh/blob/master/lib/completion.zsh
+#
+
+autoload -U compinit
+compinit
+
 # fixme - the load process here seems a bit bizarre
 zmodload -i zsh/complist
 
