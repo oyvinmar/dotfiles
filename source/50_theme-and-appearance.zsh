@@ -1,5 +1,11 @@
+# Prompt theme
+# https://github.com/sindresorhus/pure
+autoload -U promptinit; promptinit
+prompt pure
+
 # ls colors
 autoload -U colors && colors
+
 
 # Enable ls colors
 export LSCOLORS="Gxfxcxdxbxegedabagacad"
@@ -28,5 +34,3 @@ setopt multios
 setopt prompt_subst
 
 [[ -n "$WINDOW" ]] && SCREEN_NO="%B$WINDOW%b " || SCREEN_NO=""
-
-

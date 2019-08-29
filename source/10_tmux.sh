@@ -15,24 +15,6 @@ function tm() {
   fi
 }
 
-# Start tmux now (at login), but only if in a login shell and not already
-# started (and possibly detached) in this shell.
-# if shopt -q login_shell && [[ ! "$TMUX_AUTO_STARTED" ]]; then
-#   TMUX_AUTO_STARTED=1
-#   # tm SOURCE
-# fi
-
-# Run an arbitrary command in the current tmux window (if only one pane)
-# otherwise create a new window and run the command there.
-function run_in_fresh_tmux_window() {
-  local panes="$(tmux list-panes | wc -l)"
-  if [[ "$panes" != 1 ]]; then
-    tmux new-window "bash --rcfile <(echo '. ~/.bashrc; $*')"
-  else
-    "$@"
-  fi
-}
-
 # Open editor and shell in new window using main-vertical layout.
 # Usage: qq [num-panes] [working-directory] [...other-args]
 function qq() {
