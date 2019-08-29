@@ -1,12 +1,17 @@
 # Dotfiles
 
-Forked from https://github.com/cowboy/dotfiles
-
 My OSX / Ubuntu dotfiles.
 
-## About this project
+Shamelessly copied from https://github.com/cowboy/dotfiles
 
-I've been using bash on-and-off for a long time (since Slackware Linux was distributed on 1.44MB floppy disks). In all that time, every time I've set up a new Linux or OS X machine, I've copied over my `.bashrc` file and my `~/bin` folder to each machine manually. And I've never done a very good job of actually maintaining these files. It's been a total mess.
+Some notable tweaks:
+- Use [zsh](https://www.zsh.org/) shell.
+- [Pure](https://github.com/sindresorhus/pure) prompt
+- [Volta](https://docs.volta.sh/) to manage JavaScript command-line tools (i.e. NodeJS, yarn, etc).
+
+
+
+## About this project
 
 I finally decided that I wanted to be able to execute a single command to "bootstrap" a new system to pull down all of my dotfiles and configs, as well as install all the tools I commonly use. In addition, I wanted to be able to re-execute that command at any time to synchronize anything that might have changed. Finally, I wanted to make it easy to re-integrate changes back in, so that other machines could be updated.
 
@@ -62,15 +67,14 @@ Scripts in the `/init` subdirectory will be executed. A whole bunch of things wi
 
 #### Both
 
-- Node.js, npm and nave via the [init/50_node.sh](init/50_node.sh) script
-- Ruby, gems and rbenv via the [init/50_ruby.sh](init/50_ruby.sh) script
-- Vim plugins via the [init/50_vim.sh](init/50_vim.sh) script
+- Set zsh as the default login shell via the [init/40_zsh.sh](init/40_zsh.sh) scrip
+- [Volta](https://docs.volta.sh/) with Node.js, npm and yarn via the [init/50_node.sh](init/50_volta.sh) script
 
 ## Hacking my dotfiles
 
 Because the [dotfiles][dotfiles] script is completely self-contained, you should be able to delete everything else from your dotfiles repo fork, and it will still work. The only thing it really cares about are the `/copy`, `/link` and `/init` subdirectories, which will be ignored if they are empty or don't exist.
 
-If you modify things and notice a bug or an improvement, [file an issue](https://github.com/cowboy/dotfiles/issues) or [a pull request](https://github.com/cowboy/dotfiles/pulls) and let me know.
+If you modify things and notice a bug or an improvement, [file an issue](https://github.com/oyvinmar/dotfiles/issues) or [a pull request](https://github.com/oyvinmar/dotfiles/pulls) and let me know.
 
 Also, before installing, be sure to [read my gently-worded note](#heed-this-critically-important-warning-before-you-install).
 
@@ -98,26 +102,26 @@ _Tested in Ubuntu 14.04 LTS_
 
 Why? Because I often completely break this repo while updating. Which means that if I do that and you run the `dotfiles` command, your home directory will burst into flames, and you'll have to go buy a new computer. No, not really, but it will be very messy.
 
-### Actual installation (for you)
+### Actual installation
 
 1. [Read my gently-worded note](#heed-this-critically-important-warning-before-you-install)
 1. Fork this repo
-1. Open a terminal/shell and do this (change `cowboy` and `master` as appropriate):
+1. Open a terminal/shell and do this (change `oyvinmar` and `master` as appropriate):
 
 #### Ubuntu
 
 ```sh
-export DOTFILES_GH_USER=cowboy
+export DOTFILES_GH_USER=oyvinmar
 export DOTFILES_GH_BRANCH=master
-bash -c "$(wget -qO- https://raw.github.com/$DOTFILES_GH_USER/dotfiles/$DOTFILES_GH_BRANCH/bin/dotfiles)" && source ~/.bashrc
+bash -c "$(wget -qO- https://raw.github.com/$DOTFILES_GH_USER/dotfiles/$DOTFILES_GH_BRANCH/bin/dotfiles)" && zsh
 ```
 
 #### macOS
 
 ```sh
-export DOTFILES_GH_USER=cowboy
+export DOTFILES_GH_USER=oyvinmar
 export DOTFILES_GH_BRANCH=master
-bash -c "$(curl -fsSL https://raw.github.com/$DOTFILES_GH_USER/dotfiles/$DOTFILES_GH_BRANCH/bin/dotfiles)" && source ~/.bashrc
+bash -c "$(curl -fsSL https://raw.github.com/$DOTFILES_GH_USER/dotfiles/$DOTFILES_GH_BRANCH/bin/dotfiles)" && zsh
 ```
 
 Since you'll be using the [dotfiles][dotfiles] command on subsequent runs, you'll only have to set the `DOTFILES_GH_USER` variable for the initial install, but if you have a custom branch, you _will_ need to export `DOTFILES_GH_BRANCH` for subsequent runs.
@@ -129,54 +133,28 @@ There's a lot of stuff that requires admin access via `sudo`, so be warned that 
 #### Ubuntu
 
 ```sh
-bash -c "$(wget -qO- https://bit.ly/cowboy-dotfiles)" && source ~/.bashrc
+bash -c "$(wget -qO- https://raw.github.com/oyvinmar/dotfiles/master/bin/dotfiles)" && zsh
 ```
 
 #### macOS
 
 ```sh
-bash -c "$(curl -fsSL https://bit.ly/cowboy-dotfiles)" && source ~/.bashrc
+bash -c "$(curl -fsSL https://raw.github.com/oyvinmar/dotfiles/master/bin/dotfiles)" && zsh
 ```
 
 ## Aliases and Functions
 
-To keep things easy, the `~/.bashrc` and `~/.bash_profile` files are extremely simple, and should never need to be modified. Instead, add your aliases, functions, settings, etc into one of the files in the `source` subdirectory, or add a new file. They're all automatically sourced when a new shell is opened. Take a look, I have [a lot of aliases and functions](source). I even have a [fancy prompt](source/50_prompt.sh) that shows the current directory, time and current git/svn repo status.
+To keep things easy, the `~/.zshrc` file is very simple, and should never need to be modified. Instead, add your aliases, functions, settings, etc into one of the files in the `source` subdirectory, or add a new file. They're all automatically sourced when a new shell is opened. Take a look, I have [a lot of aliases and functions](source).
 
 ## Scripts
 
-In addition to the aforementioned [dotfiles][dotfiles] script, there are a few other [bin scripts](bin). This includes [nave](https://github.com/isaacs/nave), which is a [git submodule](vendor).
+In addition to the aforementioned [dotfiles][dotfiles] script, there are a few other [bin scripts](bin).
 
 - [dotfiles][dotfiles] - (re)initialize dotfiles. It might ask for your password (for `sudo`).
-- [src](link/.bashrc#L8-18) - (re)source all files in `/source` directory
+- [src](link/.zshrc#L78-84) - (re)source all files in `/source` directory
 - Look through the [bin](bin) subdirectory for a few more.
-
-## Prompt
-
-I think [my bash prompt](source/50_prompt.sh) is awesome. It shows git and svn repo status, a timestamp, error exit codes, and even changes color depending on how you've logged in.
-
-Git repos display as **[branch:flags]** where flags are:
-
-**?** untracked files
-**!** changed (but unstaged) files
-**+** staged files
-
-SVN repos display as **[rev1:rev2]** where rev1 and rev2 are:
-
-**rev1** last changed revision
-**rev2** revision
-
-Check it out:
-
-![My awesome bash prompt](http://farm8.staticflickr.com/7142/6754488927_563dd73553_b.jpg)
-
-## Inspiration
-
-<https://github.com/gf3/dotfiles>
-<https://github.com/mathiasbynens/dotfiles>
-(and 15+ years of accumulated crap)
 
 ## License
 
-Copyright (c) 2014 "Cowboy" Ben Alman
+Copyright (c) 2019 Øyvind Marthinsen
 Licensed under the MIT license.
-<http://benalman.com/about/license/>
