@@ -3,7 +3,7 @@ export DOTFILES=~/.dotfiles
 #
 # fpath
 #
-fpath=($DOTFILES/zfunctions $fpath)
+fpath=($DOTFILES/zfunctions $DOTFILES/vendor/zsh-completions/src $fpath)
 
 # As per `brew info zsh-completions`
 # if is_osx; then
