@@ -40,6 +40,8 @@
 #   untracked = cyan
 [push]
   default = simple
+[remote "origin"]
+  push = HEAD
 [url "git@github.com:"]
   insteadOf = "gh:"
   pushInsteadOf = "github:"
