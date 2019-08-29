@@ -15,6 +15,10 @@ function tm() {
   fi
 }
 
+function toc() {
+  tmux new-session -d "teamocil $1" \; attach
+}
+
 # Open editor and shell in new window using main-vertical layout.
 # Usage: qq [num-panes] [working-directory] [...other-args]
 function qq() {
