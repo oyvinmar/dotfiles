@@ -497,13 +497,8 @@ fi
 [[ -d $DOTFILES/bin ]] && export PATH=$DOTFILES/bin:$PATH
 
 # Tweak file globbing.
-if is_zsh; then
-  setopt -s dotglob
-  setopt -s nullglob
-else
-  shopt -s dotglob
-  shopt -s nullglob
-fi
+shopt -s dotglob
+shopt -s nullglob
 
 # Create caches dir and init subdir, if they don't already exist.
 mkdir -p "$DOTFILES/caches/init"
