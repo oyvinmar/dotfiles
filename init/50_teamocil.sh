@@ -1,3 +1,3 @@
-if [[ ! "$(type -P teamocile)" ]] then
-  gem install teamocile
+if [[ ! "$(type -P teamocil)" ]]; then
+  gem install teamocil
 fi
