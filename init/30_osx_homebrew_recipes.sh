@@ -15,6 +15,7 @@ recipes=(
   tmux
   wget
   ruby
+  neovim
 )
 
 brew_install_recipes

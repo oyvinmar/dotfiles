@@ -34,6 +34,7 @@ apt_packages+=(
   zsh
   thefuck
   ruby-full
+  neovim
 )
 
 # https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-ansible-on-ubuntu-16-04
