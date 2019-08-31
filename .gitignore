@@ -11,5 +11,8 @@
 /link/.ssh/conf/hosts.ssh
 /link/.ssh/authorized_keys
 
+# vim pluggins
+/link/.vim/plugged/
+
 # Ignore any file with LOCAL in the name (good for per-machine vars/functions)
 *LOCAL*
