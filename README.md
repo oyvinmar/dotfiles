@@ -27,6 +27,7 @@ When [dotfiles][dotfiles] is run for the first time, it does a few things:
 1. This repo is cloned into your user directory, under `~/.dotfiles`.
 1. Files in `/copy` are copied into `~/`. ([read more](#the-copy-step))
 1. Files in `/link` are symlinked into `~/`. ([read more](#the-link-step))
+1. Files in `/config` are symlinked into `~/.config`. ([read more](#the-config-step))
 1. You are prompted to choose scripts in `/init` to be executed. The installer attempts to only select relevant scripts, based on the detected OS and the script filename.
 1. Your chosen init scripts are executed (in alphanumeric order, hence the funky names). ([read more](#the-init-step))
 
@@ -49,6 +50,10 @@ Any file in the `/copy` subdirectory will be copied into `~/`. Any file that _ne
 ### The "link" step
 
 Any file in the `/link` subdirectory gets symlinked into `~/` with `ln -s`. Edit one or the other, and you change the file in both places. Don't link files containing sensitive data, or you might accidentally commit that data! If you're linking a directory that might contain sensitive data (like `~/.ssh`) add the sensitive files to your [.gitignore](.gitignore) file!
+
+### The "config" step
+
+Same as [the link step](#the-link-step) except that all files get symlinked into `~/.config`.
 
 ### The "init" step
 
