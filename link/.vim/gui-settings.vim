@@ -56,18 +56,15 @@ augroup END
 syntax enable
 
 set background=dark
-" let g:lightline = {
-" \ 'colorscheme': 'one',
-" \ }
-" colorscheme one
+colorscheme one
 
-let g:lightline = {
-\ 'colorscheme': 'snazzy',
-\ }
-colorscheme snazzy
-set laststatus=2
-let g:SnazzyTransparent = 1
+" colorscheme snazzy
+" let g:SnazzyTransparent = 1
 
-" Transparent background
-hi NonText guibg=NONE ctermbg=NONE
+" Transparent backgrounds
+hi clear SignColumn
+hi SignColumn ctermbg=NONE guibg=NONE
+hi NonText guibg=NONE ctermbg=NONE guifg=NONE ctermfg=NONE
 hi Normal guibg=NONE ctermbg=NONE
+hi StatusLine guibg=NONE ctermbg=NONE
+hi StatusLineNC ctermbg=NONE guibg=NONE
