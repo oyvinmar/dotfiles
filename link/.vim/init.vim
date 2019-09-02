@@ -133,6 +133,7 @@ if !len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
   " Everything's already installed. Configure the plugins
   source ~/.vim/gui-settings.vim
   source ~/.vim/keys.vim
+  source ~/.vim/functions.vim
   " Some vim reset plugin screws up listchars
   set listchars = "eol:$"
   " source ~/.vim/vimrc.custom.after
@@ -153,6 +154,7 @@ else
     " Source the settings just in case they respond with "No, don't update plugins"
     source ~/.vim/gui-settings.vim
     source ~/.vim/keys.vim
+    source ~/.vim/functions.vim
 
     " Some vim reset plugin screws up listchars
     set listchars = "eol:$"
@@ -162,6 +164,7 @@ else
     PlugInstall --sync
     source ~/.vim/gui-settings.vim
     source ~/.vim/keys.vim
+    source ~/.vim/functions.vim
     " Some vim reset plugin screws up listchars
     set listchars = "eol:$"
   endif
