@@ -504,7 +504,7 @@ shopt -s nullglob
 mkdir -p "$DOTFILES/caches/init"
 
 # Create .config dir, if it does'nt already exist
-mkdir -p "~/.config"
+mkdir -p "$HOME/.config"
 
 # If backups are needed, this is where they'll go.
 backup_dir="$DOTFILES/backups/$(date "+%Y_%m_%d-%H_%M_%S")/"
