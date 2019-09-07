@@ -10,7 +10,7 @@ alias gpa='gp --all'
 alias gu='git pull'
 alias gl='git log'
 alias gg='gl --decorate --oneline --graph --date-order --all'
-alias gs='git status'
+alias gs='git st'
 alias gst='gs'
 alias gd='git diff'
 alias gdc='gd --cached'
@@ -22,12 +22,7 @@ function gc() { git checkout "${@:-master}"; } # Checkout master by default
 alias gco='gc'
 alias gcb='gc -b'
 alias gbc='gc -b' # Dyslexia
-alias gr='git remote'
-alias grv='gr -v'
-#alias gra='git remote add'
-alias grr='git remote rm'
 alias gcl='git clone'
-alias gcd='git rev-parse 2>/dev/null && cd "./$(git rev-parse --show-cdup)"'
 
 # Current branch or SHA if detached.
 alias gbs='git branch | perl -ne '"'"'/^\* (?:\(detached from (.*)\)|(.*))/ && print "$1$2"'"'"''
