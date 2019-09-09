@@ -1,5 +1,5 @@
-# OSX-only stuff. Abort if not OSX.
-is_osx || return 1
+# macOS-only stuff. Abort if not macOS.
+is_macOS || return 1
 
 # Install Homebrew.
 if [[ ! "$(type -P brew)" ]]; then
