@@ -428,26 +428,26 @@ fi
 EOF
 }
 # Offer to create the sudoers file if it doesn't exist.
-if is_ubuntu && [[ ! -e $sudoers_file ]]; then
-  cat <<EOF
+# if is_ubuntu && [[ ! -e $sudoers_file ]]; then
+#   cat <<EOF
 
-The sudoers file can be updated to allow "sudo apt-get" to be executed
-without asking for a password. You can verify that this worked correctly by
-running "sudo -k apt-get". If it doesn't ask for a password, and the output
-looks normal, it worked.
+# The sudoers file can be updated to allow "sudo apt-get" to be executed
+# without asking for a password. You can verify that this worked correctly by
+# running "sudo -k apt-get". If it doesn't ask for a password, and the output
+# looks normal, it worked.
 
-THIS SHOULD ONLY BE ATTEMPTED IF YOU ARE LOGGED IN AS ROOT IN ANOTHER SHELL.
+# THIS SHOULD ONLY BE ATTEMPTED IF YOU ARE LOGGED IN AS ROOT IN ANOTHER SHELL.
 
-This will be skipped if "Y" isn't pressed within the next $prompt_delay seconds.
-EOF
-  read -N 1 -t $prompt_delay -p "Update sudoers file? [y/N] " update_sudoers; echo
-  if [[ "$update_sudoers" =~ [Yy] ]]; then
-    e_header "Creating sudoers file"
-    sudo bash -c "$(sudoers_code)"
-  else
-    echo "Skipping."
-  fi
-fi
+# This will be skipped if "Y" isn't pressed within the next $prompt_delay seconds.
+# EOF
+#   read -N 1 -t $prompt_delay -p "Update sudoers file? [y/N] " update_sudoers; echo
+#   if [[ "$update_sudoers" =~ [Yy] ]]; then
+#     e_header "Creating sudoers file"
+#     sudo bash -c "$(sudoers_code)"
+#   else
+#     echo "Skipping."
+#   fi
+# fi
 
 # Ensure that we can actually, like, compile anything.
 if [[ ! "$(type -P gcc)" ]] && is_macOS; then
