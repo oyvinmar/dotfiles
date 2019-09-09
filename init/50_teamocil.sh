@@ -1,3 +1,9 @@
 if [[ ! "$(type -P teamocil)" ]]; then
-  gem install teamocil
+  echo "Installing teamocil"
+
+  if is_macOS; then
+    gem install teamocil
+  else
+    sudo gem install teamocil
+  fi
 fi
