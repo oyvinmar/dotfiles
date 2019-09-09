@@ -6,8 +6,10 @@ Shamelessly copied from https://github.com/cowboy/dotfiles
 
 Some notable tweaks:
 - Use [zsh](https://www.zsh.org/) shell.
-- [Pure](https://github.com/sindresorhus/pure) prompt
+- [Pure](https://github.com/sindresorhus/pure) prompt.
 - [Volta](https://docs.volta.sh/) to manage JavaScript command-line tools (i.e. NodeJS, yarn, etc).
+- [Teamocil](http://www.teamocil.com/) for creating tmux panes and windows.
+- [Hyper](https://hyper.is/) with [Snazzy](https://github.com/sindresorhus/hyper-snazzy/) theme.
 
 
 
