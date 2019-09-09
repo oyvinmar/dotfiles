@@ -70,7 +70,7 @@ function is_zsh() {
   [[ $(echo $SHELL) == $(which zsh) ]] || return 1
 }
 function get_os() {
-  for os in macOS ubuntu ubuntu_desktop; do
+  for os in macos ubuntu ubuntu_desktop; do
     is_$os; [[ $? == ${1:-0} ]] && echo $os
   done
 }
