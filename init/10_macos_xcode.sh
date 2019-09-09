@@ -1,5 +1,5 @@
 # macOS-only stuff. Abort if not macOS.
-is_macOS || return 1
+is_macos || return 1
 
 # Some tools look for XCode, even though they don't need it.
 # https://github.com/joyent/node/issues/3681

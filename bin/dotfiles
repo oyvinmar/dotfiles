@@ -57,7 +57,7 @@ function is_dotfiles_bin() {
 }
 
 # OS detection
-function is_macOS() {
+function is_macos() {
   [[ "$OSTYPE" =~ ^darwin ]] || return 1
 }
 function is_ubuntu() {
@@ -450,7 +450,7 @@ EOF
 # fi
 
 # Ensure that we can actually, like, compile anything.
-if [[ ! "$(type -P gcc)" ]] && is_macOS; then
+if [[ ! "$(type -P gcc)" ]] && is_macos; then
   e_error "XCode or the Command Line Tools for XCode must be installed first."
   exit 1
 fi
