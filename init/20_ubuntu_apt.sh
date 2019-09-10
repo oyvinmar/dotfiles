@@ -91,11 +91,11 @@ sudo apt-get -qq update
 
 # Only do a dist-upgrade on initial install, otherwise do an upgrade.
 e_header "Upgrading APT"
-if is_dotfiles_bin; then
-  sudo apt-get -qy upgrade
-else
-  sudo apt-get -qy dist-upgrade
-fi
+# if is_dotfiles_bin; then
+sudo apt-get -qy upgrade
+# else
+  # sudo apt-get -qy dist-upgrade
+# fi
 
 # Install APT packages.
 installed_apt_packages="$(dpkg --get-selections | grep -v deinstall | awk 'BEGIN{FS="[\t:]"}{print $1}' | uniq)"
