@@ -9,7 +9,7 @@
 /link/.ssh/keys/*
 !/link/.ssh/keys/.gitkeep
 /link/.ssh/conf/hosts.ssh
-/link/.ssh/authorized_keys
+!/link/.ssh/authorized_keys
 
 # vim pluggins
 /link/.vim/plugged/
