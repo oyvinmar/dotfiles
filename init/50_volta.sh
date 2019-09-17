@@ -1,3 +1,11 @@
 curl https://get.volta.sh | bash
-~/.volta/volta install node
-~/.volta/volta install yarn
+
+tools=(
+  node
+  yarn
+  serve
+)
+
+for tool in "${tools[@]}"; do
+  ~/.volta/volta install $tool
+done
