@@ -1,6 +1,6 @@
 windows:
   - name: react-workshop
-    root: ~/develop/knowit/reactworkshop
+    root: ~/develop/knowit/react-workshop
     layout: even-horizontal
     panes:
       - yarn start
