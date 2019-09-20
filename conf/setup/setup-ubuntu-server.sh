@@ -18,3 +18,10 @@ sed -i 's/^#PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/ssh
 sed -i 's/^#AllowTcpForwarding yes/AllowTcpForwarding yes/g' /etc/ssh/sshd_config
 sed -i 's/^UsePAM yes/UsePAM no/g' /etc/ssh/sshd_config
 service ssh restart
+
+sudo ufw allow ssh
+sudo ufw allow 80
+sudo ufw allow 443
+sudo ufw show added
+sudo ufw --force enable
+sudo ufw status
