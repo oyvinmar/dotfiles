@@ -27,6 +27,7 @@ recipes=(
   wget
   ruby
   neovim
+  tree
 )
 
 brew_install_recipes

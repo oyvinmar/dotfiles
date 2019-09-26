@@ -30,6 +30,13 @@ alias l='ls -lah'
 alias ll='ls -lh'
 alias la='ls -lAh'
 
+
+if [[ "$(which tree)" =~ tree$ ]]; then
+  alias t='tree --dirsfirst -C'
+  alias ta='tree --dirsfirst -Ca'
+  alias td='tree --dirsfirst -Cd'
+fi
+
 # Recursively delete `.DS_Store` files
 alias dsstore="find . -name '*.DS_Store' -type f -ls -delete"
 
