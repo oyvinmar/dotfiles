@@ -24,21 +24,12 @@ let g:NERDSpaceDelims = 1
 let g:NERDDefaultAlign = 'left'
 
 " ==============================================================================
-Plug 'itchyny/lightline.vim'
-let g:lightline = {
-      \ 'colorscheme': 'minimal',
-      \ 'active': {
-      \   'left': [ [ 'mode', 'paste' ],
-      \             [ 'readonly', 'filename' ] ],
-      \   'right': [ [ 'percent' ],
-      \              [ 'filetype' ] ]
-      \ },
-      \ 'inactive': {
-      \   'left': [ [ 'readonly', 'filename' ] ],
-      \   'right': [ [ 'percent' ] ]
-      \ },
-      \ }
-set laststatus=2
+Plug 'connorholyday/vim-snazzy'
 
 " ==============================================================================
-Plug 'connorholyday/vim-snazzy'
+Plug 'scrooloose/nerdtree'
+source ~/.vim/pluginrc/nerdtree.vim
+
+" ==============================================================================
+Plug 'itchyny/lightline.vim'
+source ~/.vim/pluginrc/lightline.vim
