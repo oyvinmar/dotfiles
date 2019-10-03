@@ -3,5 +3,5 @@ windows:
     root: ~/develop/entur/op-ui
     layout: even-horizontal
     panes:
-      - yarn start
+      - npm start
       - git status
