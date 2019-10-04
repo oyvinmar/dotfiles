@@ -18,11 +18,15 @@ alias gm='git commit -m'
 alias gma='git commit -am'
 alias gb='git branch'
 alias gba='git branch -a'
+
 function gc() { git checkout "${@:-master}"; } # Checkout master by default
+compdef _git gc=git-checkout
+
 alias gco='gc'
 alias gcb='gc -b'
 alias gbc='gc -b' # Dyslexia
 alias gcl='git clone'
+alias gfm='git fetch origin master:master'
 
 # Current branch or SHA if detached.
 alias gbs='git branch | perl -ne '"'"'/^\* (?:\(detached from (.*)\)|(.*))/ && print "$1$2"'"'"''
