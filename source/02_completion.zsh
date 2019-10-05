@@ -69,3 +69,9 @@ zstyle '*' single-ignored show
 #   rm $GIT_ZSH_COMPLETIONS_FILE_PATH
 #   fi
 # }
+
+# Don't autocomplete tags on git-checkout + gc function alias
+zstyle ':completion::complete:git-checkout:argument-rest:commit-tag-refs' command "echo"
+zstyle ':completion::complete:git-checkout:argument-rest:blob-tag-refs' command "echo"
+zstyle ':completion::complete:gc:argument-rest:commit-tag-refs' command "echo"
+zstyle ':completion::complete:gc:argument-rest:blob-tag-refs' command "echo"
