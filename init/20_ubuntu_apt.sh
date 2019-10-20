@@ -44,6 +44,9 @@ apt_packages+=(
 # apt_packages+=(ansible)
 
 
+# debs
+deb_installed+=(/usr/bin/bat)
+deb_sources+=(https://github.com/sharkdp/bat/releases/download/v0.12.1/bat_0.12.1_amd64.deb)
 
 ####################
 # ACTUALLY DO THINGS

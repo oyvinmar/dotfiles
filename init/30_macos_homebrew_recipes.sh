@@ -28,6 +28,7 @@ recipes=(
   ruby
   neovim
   tree
+  bat
 )
 
 brew_install_recipes
