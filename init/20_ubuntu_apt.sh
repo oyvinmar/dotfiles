@@ -42,6 +42,9 @@ apt_packages+=(
 # https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-ansible-on-ubuntu-16-04
 # add_ppa ppa:ansible/ansible
 # apt_packages+=(ansible)
+add_ppa ppa:jgmath2000/et
+apt_packages+=(et)
+
 
 
 # debs

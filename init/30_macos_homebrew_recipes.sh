@@ -29,6 +29,7 @@ recipes=(
   neovim
   tree
   bat
+  et
 )
 
 brew_install_recipes
