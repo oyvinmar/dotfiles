@@ -12,9 +12,26 @@ function brew_install_recipes() {
   fi
 }
 
+function brew_tap_kegs() {
+  kegs=($(setdiff "${kegs[*]}" "$(brew tap)"))
+  if (( ${#kegs[@]} > 0 )); then
+    e_header "Tapping Homebrew kegs: ${kegs[*]}"
+    for keg in "${kegs[@]}"; do
+      brew tap $keg
+    done
+  fi
+}
+
+
 # Exit if Homebrew is not installed.
 [[ ! "$(type -P brew)" ]] && e_error "Brew recipes need Homebrew to install." && return 1
 
+# Ensure third party kegs are tapped.
+kegs=(
+  MisterTea/et
+)
+
+brew_tap_kegs
 # Homebrew recipes
 recipes=(
   zsh
