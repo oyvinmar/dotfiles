@@ -27,7 +27,7 @@ src
 
 #------------------------------------------------
 
-# Needs to be here to prevent volta install script from readding it
+# Needs to be here to prevent volta install script from re-adding it
 export VOLTA_HOME="$HOME/.volta"
 [ -s "$VOLTA_HOME/load.sh" ] && . "$VOLTA_HOME/load.sh"
 
