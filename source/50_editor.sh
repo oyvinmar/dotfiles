@@ -8,13 +8,6 @@ if [[ "$(which mvim)" =~ mvim$ ]]; then
    alias vim="$EDITOR"
 fi
 
-if [[ ! "$SSH_TTY" ]]; then
-  if [[ ! "$TMUX" ]]; then
-    is_macos && EDITOR=mvim || EDITOR=gvim
-  fi
-  export LESSEDIT="$EDITOR ?lm+%lm -- %f"
-  export GIT_EDITOR="$EDITOR -f"
-fi
 
 export VISUAL="$EDITOR"
 
