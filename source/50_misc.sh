@@ -7,3 +7,7 @@ export LESS=-XR
 # if [[ "$(which thefuck)" ]]; then
 #   eval $(thefuck --alias)
 # fi
+
+function gfind() {
+  find . -type f -exec grep -H  ""$@"" {} \;
+}
