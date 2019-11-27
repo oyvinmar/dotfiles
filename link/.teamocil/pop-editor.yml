@@ -1,6 +1,6 @@
 windows:
-  - name: netext-editor
-    root: ~/develop/entur/netex-editor
+  - name: pop-editor
+    root: ~/develop/entur/pop-editor
     layout: even-horizontal
     panes:
       - yarn dev
