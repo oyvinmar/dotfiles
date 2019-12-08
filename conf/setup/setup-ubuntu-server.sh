@@ -20,6 +20,7 @@ sed -i 's/^#PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/ssh
 sed -i 's/^#AllowTcpForwarding yes/AllowTcpForwarding yes/g' /etc/ssh/sshd_config
 service ssh restart
 
+sudo apt-get install ufw
 sudo ufw allow ssh
 sudo ufw allow 80
 sudo ufw allow 443
