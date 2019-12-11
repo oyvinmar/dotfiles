@@ -17,6 +17,7 @@ sed -i 's/^PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config
 # Newer ubuntu releases sets prohibit-password as default
 sed -i 's/^PermitRootLogin prohibit-password/PermitRootLogin no/g' /etc/ssh/sshd_config
 sed -i 's/^#PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config
+sed -i 's/^#AllowAgentForwarding yes/AllowAgentForwarding yes/g' /etc/ssh/sshd_config
 sed -i 's/^#AllowTcpForwarding yes/AllowTcpForwarding yes/g' /etc/ssh/sshd_config
 service ssh restart
 
