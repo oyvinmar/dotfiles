@@ -15,10 +15,8 @@ casks=(
    alfred
    bartender
    docker
-   dropbox
    kap
    google-chrome
-   google-chrome-canary
    hyper
    visual-studio-code
    firefox
@@ -31,7 +29,6 @@ casks=(
    spotify
    pastebot
    the-unarchiver
-   tweetbot
    simplenote
    whatsapp
 )
