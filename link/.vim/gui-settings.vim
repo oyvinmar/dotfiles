@@ -4,7 +4,7 @@ set noshowmode " Get rid of extra --INSERT-- rendered below.
 syntax enable
 
 set background=dark
-colorscheme one
+colorscheme snazzy
 
 " colorscheme snazzy
 " let g:SnazzyTransparent = 1

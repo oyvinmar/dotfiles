@@ -24,9 +24,6 @@ let g:NERDSpaceDelims = 1
 let g:NERDDefaultAlign = 'left'
 
 " ==============================================================================
-Plug 'connorholyday/vim-snazzy'
-
-" ==============================================================================
 Plug 'scrooloose/nerdtree'
 source ~/.vim/pluginrc/nerdtree.vim
 
