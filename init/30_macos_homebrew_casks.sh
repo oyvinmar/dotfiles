@@ -31,6 +31,8 @@ casks=(
    the-unarchiver
    simplenote
    whatsapp
+   fantastical
+   rocket
 )
 
 # Install Homebrew casks.
