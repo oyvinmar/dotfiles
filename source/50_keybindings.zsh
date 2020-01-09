@@ -3,7 +3,7 @@
 # Word style: directory delimiter
 # http://stackoverflow.com/a/1438523
 autoload -U select-word-style
-select-word-style bash
+select-word-style whitespace
 
 # [Shift-Tab] to reverse through completions menu
 # http://stackoverflow.com/a/842370
