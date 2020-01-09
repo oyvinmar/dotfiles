@@ -16,7 +16,7 @@ function tm() {
 }
 
 function toc() {
-  tmux new-session -d "teamocil $1" \; attach
+  tmux new-session -s $1 -d "teamocil $1" \; attach
 }
 
 # Open editor and shell in new window using main-vertical layout.
