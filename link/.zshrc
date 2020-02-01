@@ -28,7 +28,6 @@ src
 #------------------------------------------------
 
 # Needs to be here to prevent volta install script from re-adding it
-export VOLTA_HOME="$HOME/.volta"
-[ -s "$VOLTA_HOME/load.sh" ] && . "$VOLTA_HOME/load.sh"
 
-export PATH="$VOLTA_HOME/bin:$PATH"
+export VOLTA_HOME="/Users/oyvind/.volta"
+grep --silent "$VOLTA_HOME/bin" <<< $PATH || export PATH="$VOLTA_HOME/bin:$PATH"
