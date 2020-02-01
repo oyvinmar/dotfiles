@@ -5,6 +5,7 @@ tools=(
   yarn
   serve
   now
+  fkill-cli
 )
 
 # For some reason we can only pipe the list when the --verbose flag is set
