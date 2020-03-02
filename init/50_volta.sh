@@ -6,6 +6,7 @@ tools=(
   serve
   now
   fkill-cli
+  dockly
 )
 
 # For some reason we can only pipe the list when the --verbose flag is set
