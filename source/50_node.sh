@@ -2,7 +2,7 @@
 
 export NODE_ENV=development
 
-alias yr='yarn run'
 alias y='yarn'
+alias yb='yarn build'
+alias yd='yarn dev'
 alias yui='yarn upgrade-interactive --latest'
-alias know='now --token $NDLA_NOW_TOKEN'
