@@ -33,6 +33,7 @@ casks=(
    whatsapp
    fantastical
    rocket
+   discord
 )
 
 # Install Homebrew casks.
