@@ -40,7 +40,7 @@ module.exports = {
 
     // custom padding (css format, i.e.: `top right bottom left`)
     // padding: '12px 14px',
-    padding: '6px 7px',
+    padding: '0px 8px',
     // padding: '0',
 
     // the full list. if you're going to provide the full color palette,
