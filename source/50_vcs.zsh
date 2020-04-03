@@ -16,6 +16,8 @@ alias gd='git diff'
 alias gdc='gd --cached'
 alias gm='git commit -m'
 alias gma='git commit -am'
+alias gam='git commit --amend -a --no-edit'
+alias gamend='git commit --amend'
 alias gb='git branch'
 alias gba='git branch -a'
 
