@@ -47,6 +47,7 @@ recipes=(
   tree
   bat
   et
+  helm@2
 )
 
 brew_install_recipes
