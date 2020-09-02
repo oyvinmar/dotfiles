@@ -47,6 +47,8 @@ if has("gui_running") " all this for gui use
   let g:vimBoxLinterErrorSymbol="✖"
   let g:vimBoxLinterWarningSymbol="✖"
   let g:vimBoxLinterOkSymbol="☻"
+
+  hi Normal guibg='#282a36'
 else
   let g:vimBoxLinterErrorSymbol="✖"
   let g:vimBoxLinterWarningSymbol="✖"
