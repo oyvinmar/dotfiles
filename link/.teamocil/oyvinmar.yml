@@ -1,7 +1,8 @@
 windows:
   - name: devlop
     root: ~/develop/personal/oyvinmar.com
-    layout: even-horizontal
+    layout: main-vertical
     panes:
       - yarn start
+      - yarn bsb-watch
       - git status

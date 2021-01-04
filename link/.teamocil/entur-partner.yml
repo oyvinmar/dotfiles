@@ -1,7 +1,0 @@
-windows:
-  - name: entur-partner
-    root: ~/develop/entur/op-ui
-    layout: even-horizontal
-    panes:
-      - yarn start
-      - git status
