@@ -3,7 +3,7 @@ is_macos || return 1
 
 # Install Homebrew recipes.
 function brew_install_recipes() {
-  recipes=($(setdiff "${recipes[*]}" "$(brew list)"))
+  recipes=($(setdiff "${recipes[*]}" "$(brew list --formula)"))
   if (( ${#recipes[@]} > 0 )); then
     e_header "Installing Homebrew recipes: ${recipes[*]}"
     for recipe in "${recipes[@]}"; do
@@ -29,6 +29,7 @@ function brew_tap_kegs() {
 # Ensure third party kegs are tapped.
 kegs=(
   MisterTea/et
+  mongodb/brew
 )
 
 brew_tap_kegs
@@ -47,7 +48,9 @@ recipes=(
   tree
   bat
   et
-  helm@2
+  mongodb-community
+  leiningen
+  redis
 )
 
 brew_install_recipes
