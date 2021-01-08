@@ -51,6 +51,7 @@ recipes=(
   mongodb-community
   leiningen
   redis
+  gh
 )
 
 brew_install_recipes
