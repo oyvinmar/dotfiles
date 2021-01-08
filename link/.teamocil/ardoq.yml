@@ -1,0 +1,19 @@
+windows:
+  - name: front
+    root: ~/develop/ardoq/ardoq-front
+    layout: even-horizontal
+    panes:
+      - yarn start
+      - git status
+  - name: api
+    root: ~/develop/ardoq/ardoq-api
+    layout: even-horizontal
+    panes:
+      - lein run --env dev
+      - git status
+  - name: docker
+    root: ~/develop/ardoq/ardoq-docker
+    layout: even-horizontal
+    panes:
+      - ./demo.sh base
+      - git status
