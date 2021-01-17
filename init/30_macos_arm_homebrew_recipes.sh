@@ -1,5 +1,7 @@
-# macOS-only stuff. Abort if not macOS.
-is_macos_x86 || return 1
+
+
+# macOS arm only stuff. Abort if not.
+is_macos_arm || return 1
 
 # Install Homebrew recipes.
 function brew_install_recipes() {
@@ -43,16 +45,28 @@ recipes=(
   thefuck
   tmux
   wget
+  htop
   ruby
-  neovim
+  # neovim
   tree
   bat
-  et
+  # et
   mongodb-community
-  leiningen
   redis
   gh
 )
+
+if [[ ! "$(type -P java)" ]]; then
+  hdiutil mount -mountpoint /Volumes/zulu https://cdn.azul.com/zulu/bin/zulu11.43.1021-ca-jdk11.0.9.1-macosx_aarch64.dmg
+  sudo installer -pkg "/Volumes/zulu/*.pkg" -target /
+  hdiutil unmount /Volumes/zulu
+
+  arch -arm64 brew install --build-from-source rlwrap
+  arch -arm64 brew install clojure/tools/clojure
+  ln -s /Library/Java/JavaVirtualMachines/zulu-11.jdk/Contents/Home /opt/homebrew/opt/openjdk
+  arch -arm64 brew install maven --ignore-dependencies
+  arch -arm64 brew install --build-from-source leiningen --ignore-dependencies
+fi
 
 brew_install_recipes
 
