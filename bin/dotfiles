@@ -61,7 +61,10 @@ function is_macos() {
   [[ "$OSTYPE" =~ ^darwin ]] || return 1
 }
 function is_macos_arm() {
-  is_macos && [[ "$(uname -m)" =~ ^arm ]] || return 1
+  if is_macos && [[ "$(uname -m)" =~ ^arm ]] then;
+    return 0
+  fi
+  return 1
 }
 function is_macos_x86() {
   is_macos && [[ "$(uname -m)" =~ ^x86_64 ]] || return 1
