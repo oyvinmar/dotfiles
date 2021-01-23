@@ -39,6 +39,9 @@ alias gu-all='eachdir git pull'
 alias gp-all='eachdir git push'
 alias gs-all='eachdir git status'
 
+# Github shortcuts
+alias merge='gh pr merge -sd'
+
 # GitHub URL for current repo.
 function gurl() {
   local remotename="${@:-origin}"
