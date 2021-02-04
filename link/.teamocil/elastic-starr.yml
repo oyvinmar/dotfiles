@@ -1,0 +1,7 @@
+windows:
+  - name: elastic-starr
+    root: ~/develop/ardoq/starr
+    layout: even-horizontal
+    panes:
+      - /opt/elasticsearch-6.8.13/bin/elasticsearch
+      - java -jar ./target/starr-1.8.1-standalone.jar --env local
