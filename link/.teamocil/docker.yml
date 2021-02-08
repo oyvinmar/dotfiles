@@ -1,0 +1,7 @@
+windows:
+  - name: docker
+    root: ~/develop/ardoq/ardoq-docker
+    layout: even-horizontal
+    panes:
+      - ./demo.sh base
+      - git status

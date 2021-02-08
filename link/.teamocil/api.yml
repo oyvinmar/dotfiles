@@ -1,0 +1,7 @@
+windows:
+  - name: api
+    root: ~/develop/ardoq/ardoq-api
+    layout: even-horizontal
+    panes:
+      - lein run --env dev
+      - git status

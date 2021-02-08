@@ -1,0 +1,7 @@
+windows:
+  - name: front
+    root: ~/develop/ardoq/ardoq-front
+    layout: even-horizontal
+    panes:
+      - yarn start
+      - git status
