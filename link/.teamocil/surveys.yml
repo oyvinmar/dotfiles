@@ -1,6 +1,6 @@
 windows:
-  - name: survey
-    root: ~/develop/ardoq/ardoq-survey
+  - name: surveys
+    root: ~/develop/ardoq/ardoq-surveys
     layout: even-horizontal
     panes:
       - yarn start
