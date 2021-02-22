@@ -1,0 +1,7 @@
+windows:
+  - name: shared-ui
+    root: ~/develop/ardoq/shared-ui
+    layout: even-horizontal
+    panes:
+      - yarn storybook
+      - git status
