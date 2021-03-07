@@ -1,0 +1,7 @@
+windows:
+  - name: front
+    root: ~/develop/ardoq/lite
+    layout: even-horizontal
+    panes:
+      - npm run dev
+      - git status
