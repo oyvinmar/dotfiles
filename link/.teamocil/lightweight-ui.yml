@@ -1,7 +1,7 @@
 windows:
   - name: front
-    root: ~/develop/ardoq/lite
+    root: ~/develop/ardoq/ardoq-lightweight-ui
     layout: even-horizontal
     panes:
-      - npm run dev
+      - yarn dev
       - git status
