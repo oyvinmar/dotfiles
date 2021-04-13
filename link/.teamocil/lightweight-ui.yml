@@ -1,5 +1,5 @@
 windows:
-  - name: front
+  - name: lightweight-ui
     root: ~/develop/ardoq/ardoq-lightweight-ui
     layout: even-horizontal
     panes:
