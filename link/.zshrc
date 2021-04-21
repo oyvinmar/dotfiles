@@ -27,10 +27,6 @@ src
 
 #------------------------------------------------
 
-# Node.js doesn't provide arm binaries yet.
-# So temporarly skip volta and use homebrew provided arm node distribution
-if is_macos_arm; [ "$?" -eq 1 ]; then
-  # Needs to be here to prevent volta install script from re-adding it
-  export VOLTA_HOME="$HOME/.volta"
-  export PATH="$VOLTA_HOME/bin:$PATH"
-fi
+# Needs to be here to prevent volta install script from re-adding it
+export VOLTA_HOME="$HOME/.volta"
+export PATH="$VOLTA_HOME/bin:$PATH"

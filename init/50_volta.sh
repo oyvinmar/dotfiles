@@ -1,7 +1,7 @@
 curl https://get.volta.sh | bash
 
 tools=(
-  node
+  node@16
   yarn
   serve
   now
