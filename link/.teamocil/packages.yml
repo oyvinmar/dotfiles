@@ -1,0 +1,7 @@
+windows:
+  - name: packages
+    root: ~/develop/ardoq/ardoq-packages
+    layout: even-horizontal
+    panes:
+      - yarn storybook
+      - git status
