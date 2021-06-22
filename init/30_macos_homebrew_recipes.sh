@@ -52,6 +52,8 @@ recipes=(
   leiningen
   redis
   gh
+  git-delta
+  exa
 )
 
 brew_install_recipes

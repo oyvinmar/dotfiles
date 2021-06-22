@@ -47,13 +47,15 @@ recipes=(
   wget
   htop
   ruby
-  # neovim
+  neovim
   tree
   bat
-  # et
+  et
   mongodb-community
   redis
   gh
+  git-delta
+  exa
 )
 
 if [[ ! "$(type -P java)" ]]; then
