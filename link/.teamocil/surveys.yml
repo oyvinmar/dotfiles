@@ -3,5 +3,5 @@ windows:
     root: ~/develop/ardoq/ardoq-surveys
     layout: even-horizontal
     panes:
-      - yarn start
-      - git status
+      - dev
+      - git st

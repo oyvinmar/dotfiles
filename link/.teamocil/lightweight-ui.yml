@@ -3,5 +3,5 @@ windows:
     root: ~/develop/ardoq/ardoq-lightweight-ui
     layout: even-horizontal
     panes:
-      - yarn dev
-      - git status
+      - dev
+      - git st
