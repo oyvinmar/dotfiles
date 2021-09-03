@@ -1,0 +1,7 @@
+windows:
+  - name: dev-cli
+    root: ~/develop/personal/dev-cli
+    layout: even-horizontal
+    panes:
+      - echo 'dev-cli'
+      - git st
