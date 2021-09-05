@@ -3,5 +3,5 @@ windows:
     root: ~/develop/personal/dev-cli
     layout: even-horizontal
     panes:
-      - echo 'dev-cli'
+      - dev-cli interactive
       - git st
