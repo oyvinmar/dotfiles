@@ -41,6 +41,7 @@ alias gs-all='eachdir git status'
 
 # Github shortcuts
 alias merge='gh pr merge -sd'
+alias list='gh pr list'
 
 # GitHub URL for current repo.
 function gurl() {
