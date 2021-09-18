@@ -1,7 +1,7 @@
 windows:
-  - name: dev-cli
-    root: ~/develop/personal/dev-cli
+  - name: nel
+    root: ~/develop/personal/nel
     layout: even-horizontal
     panes:
-      - dev-cli interactive
+      - nel interactive
       - git st

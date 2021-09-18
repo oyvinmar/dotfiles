@@ -3,5 +3,5 @@ windows:
     root: ~/develop/ardoq/ardoq-lightweight-ui
     layout: even-horizontal
     panes:
-      - dev-cli interactive
+      - nel interactive
       - git st

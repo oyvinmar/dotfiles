@@ -6,10 +6,12 @@ alias y='yarn'
 alias yb='yarn build'
 alias yd='yarn dev'
 alias yui='yarn upgrade-interactive --latest'
-alias dev='dev-cli dev'
-alias build='dev-cli build'
-alias watch='dev-cli watch'
-alias cop='dev-cli vc co'
+alias dev='nel dev'
+alias build='nel build'
+alias watch='nel watch'
+alias cb='nel vc co'
+alias cpr='nel vc cop'
+alias vc='nel vc'
 
 function nr () {
   npm run $1 -- $@[2,-1]
