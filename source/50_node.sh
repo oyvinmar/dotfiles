@@ -10,8 +10,9 @@ alias dev='nel dev'
 alias build='nel build'
 alias watch='nel watch'
 alias deploy='nel deploy'
+alias merge='nel merge'
 alias cb='nel vc co'
-alias copr='nel vc cop'
+alias cpr='nel vc cop'
 alias vc='nel vc'
 
 function nr () {
