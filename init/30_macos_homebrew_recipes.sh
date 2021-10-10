@@ -1,5 +1,5 @@
 # macOS-only stuff. Abort if not macOS.
-is_macos_x86 || return 1
+is_macos || return 1
 
 # Install Homebrew recipes.
 function brew_install_recipes() {
@@ -49,6 +49,7 @@ recipes=(
   bat
   et
   mongodb-community
+  openjdk
   leiningen
   redis
   gh
