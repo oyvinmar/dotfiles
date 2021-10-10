@@ -54,6 +54,7 @@ recipes=(
   gh
   git-delta
   exa
+  fd
 )
 
 brew_install_recipes

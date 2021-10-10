@@ -56,6 +56,7 @@ recipes=(
   gh
   git-delta
   exa
+  fd
 )
 
 if [[ ! "$(type -P java)" ]]; then
