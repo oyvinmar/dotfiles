@@ -9,7 +9,7 @@ tools=(
   dockly
   git-checkout-interactive
   jira-cli
-  @oyvinmar-forks/dev-cli
+  @oyvinmar-forks/nel
 )
 
 # For some reason we can only pipe the list when the --verbose flag is set

@@ -1,0 +1,38 @@
+_git-checkout () {
+        local new_branch_reflog_opt
+        if (( words[(I)-b|-B|--orphan] ))
+        then
+                new_branch_reflog_opt="(--patch)-l[create the new branch's reflog]"
+        fi
+        local curcontext=$curcontext state line ret=1
+        declare -A opt_args
+        _arguments -C -s '(-q --quiet --progress)'{-q,--quiet}'[suppress progress reporting]' '(-f --force -m --merge --conflict --patch)'{-f,--force}'[force branch switch/ignore unmerged entries]' '(-q --quiet -2 --ours -3 --theirs --patch)'{-2,--ours}'[check out stage #2 for unmerged paths]' '(-q --quiet -2 --ours -3 --theirs --patch)'{-3,--theirs}'[check out stage #3 for unmerged paths]' '(   -B --orphan -2 --ours -3 --theirs --conflict --patch --detach)-b+[create a new branch based at given commit]: :__git_branch_names' '(-b    --orphan -2 --ours -3 --theirs --conflict --patch --detach)-B+[create or update branch based at given commit]: :__git_branch_names' '(-t --track --orphan --patch --detach)'{-t,--track}'[set up configuration so pull merges from the base commit]' '(--patch)--no-track[override the branch.autosetupmerge configuration variable]' $new_branch_reflog_opt '(-b -B -t --track --patch --orphan)--detach[detach the HEAD at named commit]' '(-b -B -t --track --patch --detach)--orphan=[create a new orphan branch based at given commit]: :__git_branch_names' '(-q --quiet -f --force -m --merge --conflict --patch)'{-m,--merge}'[3way merge current branch, working tree and new branch]' '(-q --quiet -f --force -m --merge --patch)--conflict=[same as --merge, using given merge style]:style:(merge diff3)' '(-)'{-p,--patch}'[interactively select hunks in diff between given tree-ish and working tree]' "--ignore-skip-worktree-bits[don't limit pathspecs to sparse entries only]" "--ignore-other-worktrees[don't check if another worktree is holding the given ref]" '--recurse-submodules=-[control recursive updating of submodules]::checkout:__git_commits' '(-q --quiet)--progress[force progress reporting]' '(-)--[start file arguments]' '*:: :->branch-or-tree-ish-or-file' && ret=0
+        case $state in
+                (branch-or-tree-ish-or-file) [[ $line[CURRENT] = -* ]] && return
+                        if (( CURRENT == 1 )) && [[ -z $opt_args[(I)--] ]]
+                        then
+                                local remote_branch_noprefix_arg='remote-branch-names-noprefix::__git_remote_branch_names_noprefix' tree_ish_arg='' file_arg='modified-files::__git_modified_files'
+                                if [[ -n ${opt_args[(I)-b|-B|--orphan|--detach]} ]]
+                                then
+                                        _alternative $tree_ish_arg && ret=0
+                                elif [[ -n $opt_args[(I)--track] ]]
+                                then
+                                        _alternative remote-branches::__git_remote_branch_names && ret=0
+                                elif [[ -n ${opt_args[(I)--ours|--theirs|-m|--conflict|--patch]} ]]
+                                then
+                                        _alternative $tree_ish_arg $file_arg && ret=0
+                                else
+                                        _alternative $file_arg $tree_ish_arg $remote_branch_noprefix_arg && ret=0
+                                fi
+                        elif [[ -n ${opt_args[(I)-b|-B|-t|--track|--orphan|--detach]} ]]
+                        then
+                                _nothing
+                        elif [[ -n $line[1] ]] && __git_is_treeish ${(Q)line[1]}
+                        then
+                                __git_ignore_line __git_tree_files ${PREFIX:-.} ${(Q)line[1]} && ret=0
+                        else
+                                __git_ignore_line __git_modified_files && ret=0
+                        fi ;;
+        esac
+        return ret
+}
