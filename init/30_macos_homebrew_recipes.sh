@@ -56,6 +56,7 @@ recipes=(
   git-delta
   exa
   fd
+  fzf
 )
 
 brew_install_recipes
