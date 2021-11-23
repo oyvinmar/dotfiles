@@ -14,6 +14,7 @@ alias merge='nel merge'
 alias cb='nel vc co'
 alias cpr='nel vc cop'
 alias vc='nel vc'
+alias nel-dev='/Users/oyvind/develop/personal/nel/dist/index.js'
 
 function nr () {
   npm run $1 -- $@[2,-1]
