@@ -23,3 +23,6 @@ alias qs="q $DOTFILES"
 
 # For when you have vim on the brain
 alias :q=exit
+
+# Open fuzzy found file in vim
+alias fvim=vim $(fzf)
