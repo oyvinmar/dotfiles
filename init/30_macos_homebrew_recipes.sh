@@ -57,6 +57,7 @@ recipes=(
   exa
   fd
   fzf
+  adr-tools
 )
 
 brew_install_recipes
