@@ -12,7 +12,7 @@ alias watch='nel watch'
 alias deploy='nel deploy'
 alias merge='nel merge'
 alias cb='nel vc co'
-alias cpr='nel vc cop'
+alias cpr='nel vc cpr'
 alias vc='nel vc'
 alias nel-dev='/Users/oyvind/develop/personal/nel/dist/index.js'
 
