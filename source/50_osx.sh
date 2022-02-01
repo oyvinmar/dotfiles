@@ -5,6 +5,7 @@ is_macos || return 1
 # PATH="/usr/local/bin:$(path_remove /usr/local/bin)"
 # export PATH
 
+export BROWSER="Microsoft Edge"
 export GEM_HOME=$HOME/.gem
 PATH="/usr/local/sbin:$GEM_HOME/bin:$PATH"
 
