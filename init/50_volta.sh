@@ -9,6 +9,7 @@ tools=(
   dockly
   git-checkout-interactive
   jira-cli
+  git-branch-delete
   @oyvinmar-forks/nel
 )
 
