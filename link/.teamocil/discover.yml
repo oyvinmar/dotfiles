@@ -1,6 +1,6 @@
 windows:
-  - name: lightweight-ui
-    root: ~/develop/ardoq/ardoq-lightweight-ui
+  - name: discover
+    root: ~/develop/ardoq/ardoq-discover
     layout: even-horizontal
     panes:
       - nel interactive
