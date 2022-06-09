@@ -58,6 +58,7 @@ recipes=(
   fd
   fzf
   adr-tools
+  ugit
 )
 
 brew_install_recipes
@@ -73,3 +74,5 @@ if [[ "$(type -P $binroot/htop)" ]] && [[ "$(stat -L -f "%Su:%Sg" "$binroot/htop
   sudo chown root:wheel "$binroot/htop"
   sudo chmod u+s "$binroot/htop"
 fi
+
+gh extension install dlvhdr/gh-dash
