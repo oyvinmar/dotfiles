@@ -18,6 +18,8 @@
   lsv = log --pretty=format:'%C(yellow)%h %C(blue)%ad%C(red)%d %C(reset)%s%C(green) [%cn]' --decorate --date=short --numstat    # a verbose ls, shows changed files too
 [help]
   autocorrect = 1
+[rerere]
+  enabled = true
 [branch "master"]
   remote = origin
   merge = refs/heads/master
