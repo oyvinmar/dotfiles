@@ -1,7 +1,9 @@
 windows:
   - name: front
-    root: ~/develop/ardoq/ardoq-front
+    root: ~/develop/ardoq/ardoq-packages
     layout: even-horizontal
     panes:
-      - nel interactive
+      - commands:
+        - cd apps/ardoq-front
+        - clear
       - git st
