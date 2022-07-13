@@ -71,6 +71,7 @@
 #     hunk-header-style= omit
 
 [push]
+  autoSetupRemote = true
   default = simple
 [remote "origin"]
   push = HEAD
