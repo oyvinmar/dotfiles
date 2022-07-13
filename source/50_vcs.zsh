@@ -24,7 +24,7 @@ alias gba='git branch -a'
 alias gbd='git-branch-delete'
 
 function gc() { git checkout "${@:-master}"; } # Checkout master by default
-compdef _git gc=git-checkout
+# compdef _git gc=git-checkout
 
 alias gco='gc'
 alias gcb='gc -b'
