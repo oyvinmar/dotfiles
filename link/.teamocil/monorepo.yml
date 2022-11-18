@@ -1,9 +1,7 @@
 windows:
-  - name: packages
+  - name: monorepo
     root: ~/develop/ardoq/ardoq-packages
     layout: even-horizontal
     panes:
-      - commands:
-        - cd packages
-        - clear
+      - clear
       - git status

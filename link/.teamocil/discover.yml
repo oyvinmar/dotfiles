@@ -1,7 +1,9 @@
 windows:
   - name: discover
-    root: ~/develop/ardoq/ardoq-discover
+    root: ~/develop/ardoq/ardoq-packages
     layout: even-horizontal
     panes:
-      - nel interactive
+      - commands:
+        - cd apps/ardoq-discover
+        - clear
       - git st
