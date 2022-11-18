@@ -1,0 +1,6 @@
+windows:
+  - name: dotfiles
+    root: ~/.dotfiles
+    layout: even-horizontal
+    panes:
+      - git status
