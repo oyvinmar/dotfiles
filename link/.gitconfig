@@ -1,9 +1,10 @@
-[user]
-  name = Øyvind Marthinsen
-  email = EMAIL
 [core]
   editor = vim
   excludesfile = ~/.gitignore_global
+[include]
+  path = ~/.gitconfig_include
+[includeIf "gitdir:~/develop/ardoq/"]
+  path = ~/develop/ardoq/.gitconfig
 [alias]
   br = branch
   ci = commit
@@ -18,6 +19,8 @@
   lsv = log --pretty=format:'%C(yellow)%h %C(blue)%ad%C(red)%d %C(reset)%s%C(green) [%cn]' --decorate --date=short --numstat    # a verbose ls, shows changed files too
 [help]
   autocorrect = 1
+[rebase]
+  updateRefs = true
 [rerere]
   enabled = true
 [branch "master"]
