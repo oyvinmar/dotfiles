@@ -2,7 +2,7 @@ curl https://get.volta.sh | bash
 
 tools=(
   node@16
-  yarn
+  yarn@1
   serve
   now
   fkill-cli
