@@ -1,9 +1,7 @@
 windows:
   - name: login
-    root: ~/develop/ardoq/ardoq-packages
+    root: ~/develop/ardoq/ardoq-packages/apps/ardoq-login
     layout: even-horizontal
     panes:
-      - commands:
-        - cd apps/ardoq-login
-        - clear
+      - clear
       - git st

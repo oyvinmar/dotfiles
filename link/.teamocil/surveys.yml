@@ -1,9 +1,7 @@
 windows:
   - name: surveys
-    root: ~/develop/ardoq/ardoq-packages
+    root: ~/develop/ardoq/ardoq-packages/apps/ardoq-surveys
     layout: even-horizontal
     panes:
-      - commands:
-        - cd apps/ardoq-surveys
-        - clear
+      - clear
       - git st
