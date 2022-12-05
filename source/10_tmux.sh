@@ -19,6 +19,12 @@ function toc() {
   tmux new-session -s $1 -d "teamocil $1" \; attach
 }
 
+alias tc='teamocil'
+alias monorepo='teamocil monorepo'
+alias front='teamocil front'
+alias discover='teamocil discover'
+alias surveys='teamocil surveys'
+
 # Open editor and shell in new window using main-vertical layout.
 # Usage: qq [num-panes] [working-directory] [...other-args]
 function qq() {
