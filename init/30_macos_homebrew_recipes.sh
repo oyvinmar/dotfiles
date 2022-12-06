@@ -59,6 +59,7 @@ recipes=(
   fzf
   adr-tools
   ugit
+  ffmpeg
 )
 
 brew_install_recipes
