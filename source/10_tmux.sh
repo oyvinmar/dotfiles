@@ -23,6 +23,7 @@ alias tc='teamocil'
 alias monorepo='teamocil monorepo'
 alias front='teamocil front'
 alias discover='teamocil discover'
+alias api='teamocil api'
 alias surveys='teamocil surveys'
 
 # Open editor and shell in new window using main-vertical layout.
