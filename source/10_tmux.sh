@@ -25,6 +25,8 @@ alias front='teamocil front'
 alias discover='teamocil discover'
 alias api='teamocil api'
 alias surveys='teamocil surveys'
+alias backoffice='teamocil backoffice'
+
 
 # Open editor and shell in new window using main-vertical layout.
 # Usage: qq [num-panes] [working-directory] [...other-args]

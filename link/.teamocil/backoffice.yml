@@ -1,0 +1,7 @@
+windows:
+  - name: backoffice
+    root: ~/develop/ardoq/ardoq-backoffice
+    layout: even-horizontal
+    panes:
+      - clear
+      - git status
