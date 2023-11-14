@@ -22,6 +22,7 @@ alias gamend='git commit --amend'
 alias gb='git branch'
 alias gba='git branch -a'
 alias gbd='git-branch-delete'
+alias fixup='git commit --amend -a --no-edit && git push --force'
 
 function gc() { git checkout "${@:-master}"; } # Checkout master by default
 # compdef _git gc=git-checkout
