@@ -5,6 +5,7 @@ alias g='git'
 function ga() { git add "${@:-.}"; } # Add all files by default
 alias gai='ga -i'
 alias gp='git push'
+alias gpf='git push --force'
 alias gpup='gp --set-upstream origin $(gbs)'
 alias gpa='gp --all'
 alias gu='git pull'
@@ -23,8 +24,9 @@ alias gb='git branch'
 alias gba='git branch -a'
 alias gbd='git-branch-delete'
 alias fixup='git commit --amend -a --no-edit && git push --force'
+alias grs='git reset --hard origin/$(gbs)'
 
-function gc() { git checkout "${@:-master}"; } # Checkout master by default
+function gc() { git switch "${@:-master}"; } # Checkout master by default
 # compdef _git gc=git-checkout
 
 alias gco='gc'
