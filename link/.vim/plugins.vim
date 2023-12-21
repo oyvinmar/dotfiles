@@ -30,3 +30,6 @@ source ~/.vim/pluginrc/nerdtree.vim
 " ==============================================================================
 Plug 'itchyny/lightline.vim'
 source ~/.vim/pluginrc/lightline.vim
+
+" ==============================================================================
+Plug 'mg979/vim-visual-multi', {'branch': 'master'}
