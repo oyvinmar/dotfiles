@@ -10,10 +10,12 @@ return 1
 # Hack to show the first-run brew-cask password prompt immediately.
 brew cask info this-is-somewhat-annoying 2>/dev/null
 brew tap homebrew/cask-versions
+brew homebrew/cask-fonts
 
 # Homebrew casks
 casks=(
   adoptopenjdk8
+  font-monaspace
   # Applications
   #  1password
   #  alfred
