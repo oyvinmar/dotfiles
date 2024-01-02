@@ -29,8 +29,7 @@ alias grs='git reset --hard origin/$(gbs)'
 function gsw() { git switch "${@:-master}"; } # Checkout master by default
 # compdef _git gc=git-checkout
 
-alias gco='gsw'
-alias gcb='gsw -c'
+alias gsc='gsw --create'
 alias gcl='git clone'
 alias gfm='git fetch origin master:master'
 
