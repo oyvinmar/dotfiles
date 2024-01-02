@@ -90,3 +90,5 @@
   pushInsteadOf = "git://gist.github.com/"
 [pull]
 	rebase = false
+[init]
+	defaultBranch = main
