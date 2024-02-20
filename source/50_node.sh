@@ -17,6 +17,8 @@ alias cpr='nel vc cpr'
 alias vc='nel vc'
 alias nel-dev='/Users/oyvind/develop/personal/nel/dist/index.js'
 
+alias delete-node-modules='find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +'
+
 function nr () {
   npm run $1 -- $@[2,-1]
 }
