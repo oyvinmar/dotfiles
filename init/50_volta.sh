@@ -1,7 +1,7 @@
 curl https://get.volta.sh | bash
 
 tools=(
-  node@16
+  node@20
   yarn@1
   serve
   now
@@ -10,7 +10,7 @@ tools=(
   git-checkout-interactive
   jira-cli
   git-branch-delete
-  @oyvinmar-forks/nel
+  @avalane/nel
 )
 
 # For some reason we can only pipe the list when the --verbose flag is set
