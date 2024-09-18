@@ -25,6 +25,7 @@ alias gba='git branch -a'
 alias gbd='git-branch-delete'
 alias fixup='git commit --amend -a --no-edit && git push --force'
 alias grs='git reset --hard origin/$(gbs)'
+alias sup='git branch --set-upstream-to origin/$(git rev-parse --abbrev-ref HEAD)' # Set upstream to origin/<current-branch>
 
 function gsw() { git switch "${@:-master}"; } # Checkout master by default
 # compdef _git gc=git-checkout
