@@ -1,0 +1,7 @@
+windows:
+  - name: process
+    root: ~/develop/ardoq/ardoq-packages/apps/ardoq-process
+    layout: even-horizontal
+    panes:
+      - clear
+      - git st

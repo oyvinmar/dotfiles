@@ -26,6 +26,7 @@ alias discover='teamocil discover'
 alias api='teamocil api'
 alias surveys='teamocil surveys'
 alias backoffice='teamocil backoffice'
+alias process='teamocil process'
 
 
 # Open editor and shell in new window using main-vertical layout.
