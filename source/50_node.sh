@@ -2,6 +2,8 @@
 
 export NODE_ENV=development
 
+alias p='pnpm'
+alias pm='pnpm'
 alias y='yarn'
 alias yb='yarn build'
 alias yd='yarn dev'
