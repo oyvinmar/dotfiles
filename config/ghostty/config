@@ -1,0 +1,10 @@
+theme = "snazzy"
+background = "#282935"
+foreground = "#efefeb"
+font-family = "'Monaspace Neon', 'JetBrains Mono', 'FiraCodeJS-Retina', Hack, Menlo, Monaco, 'Courier New', monospace"
+font-size = 16
+cursor-style = block
+window-padding-x = 4
+window-padding-y = 0
+macos-titlebar-style = tabs
+cursor-style-blink = false
