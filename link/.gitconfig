@@ -17,12 +17,21 @@
   sup = log --since '1 day ago' --oneline --author EMAIL  # I know what you did yesterday - great for follow-ups
   ls = log --pretty=format:'%C(yellow)%h %C(blue)%ad%C(red)%d %C(reset)%s%C(green) [%cn]' --decorate --date=short  # pretty one-line log with tags, branches and authors
   lsv = log --pretty=format:'%C(yellow)%h %C(blue)%ad%C(red)%d %C(reset)%s%C(green) [%cn]' --decorate --date=short --numstat    # a verbose ls, shows changed files too
+[column]
+  ui = auto
+[branch]
+  sort = -committerdate
 [help]
   autocorrect = 1
 [rebase]
+  autoSquash = true
+  autoStash = true
   updateRefs = true
 [rerere]
   enabled = true
+  autoupdate = true
+[commit]
+  verbose = true
 [branch "master"]
   remote = origin
   merge = refs/heads/master
@@ -43,7 +52,13 @@
 [diff]
   external = difft
   tool = difftastic
+  algorithm = histogram
+  colorMoved = plain
+  mnemonicPrefix = true
+  renames = true
 
+[merge]
+  conflictstyle = zdiff3 
 [difftool]
   prompt = false
 
@@ -76,6 +91,11 @@
 [push]
   autoSetupRemote = true
   default = simple
+  followTags = true
+[fetch]
+  prune = true
+  pruneTags = true
+  all = true
 [remote "origin"]
   push = HEAD
 [url "git@github.com:"]
