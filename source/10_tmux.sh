@@ -27,7 +27,7 @@ alias api='teamocil api'
 alias surveys='teamocil surveys'
 alias backoffice='teamocil backoffice'
 alias process='teamocil process'
-
+alias gen-ui='teamocil generative-ui'
 
 # Open editor and shell in new window using main-vertical layout.
 # Usage: qq [num-panes] [working-directory] [...other-args]

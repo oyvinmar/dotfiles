@@ -1,0 +1,10 @@
+windows:
+  - name: generative-ui
+    root: ~/develop/ardoq/generative-ui
+    layout: main-vertical
+    panes:
+      - claude
+      - commands:
+          - cd apps/ardoq-front
+          - clear
+      - clear
