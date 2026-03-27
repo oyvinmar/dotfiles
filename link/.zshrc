@@ -25,11 +25,7 @@ function dotfiles() {
 
 src
 
-#------------------------------------------------
-
-# Needs to be here to prevent volta install script from re-adding it
-export VOLTA_HOME="$HOME/.volta"
-export PATH="$VOLTA_HOME/bin:$PATH"
+eval "$(mise activate zsh)"
 
 # tabtab source for packages
 # uninstall by removing these lines

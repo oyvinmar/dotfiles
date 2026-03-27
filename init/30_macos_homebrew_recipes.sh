@@ -60,6 +60,7 @@ recipes=(
   adr-tools
   ugit
   ffmpeg
+  mise
 )
 
 brew_install_recipes
