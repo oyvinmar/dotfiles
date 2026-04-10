@@ -1,0 +1,15 @@
+[tools]
+node = "25.8.2"
+npm = "11.12.1"
+"npm:@avalane/nel" = "latest"
+"npm:serve" = "latest"
+"npm:fkill-cli" = "latest"
+"npm:dockly" = "latest"
+"npm:agent-browser" = "latest"
+
+pnpm = "10.29.2"
+
+[settings]
+
+[settings.npm]
+package_manager = "pnpm"
