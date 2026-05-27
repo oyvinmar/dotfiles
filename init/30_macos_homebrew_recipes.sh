@@ -54,13 +54,14 @@ recipes=(
   redis
   gh
   git-delta
-  exa
+  eza
   fd
   fzf
   adr-tools
   ugit
   ffmpeg
   mise
+  osv-scanner
 )
 
 brew_install_recipes

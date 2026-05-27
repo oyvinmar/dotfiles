@@ -24,12 +24,12 @@ alias 9='cd -9'
 alias rd=rmdir
 alias d='dirs -v | head -10'
 
-alias ls='exa'
+alias ls='eza'
 # List directory contents
-alias lsa='exa -lah'
-alias l='exa -lah'
-alias ll='exa -lh'
-alias la='exa -lah'
+alias lsa='eza -lah'
+alias l='eza -lah'
+alias ll='eza -lh'
+alias la='eza -lah'
 
 
 if [[ "$(which tree)" =~ tree$ ]]; then
