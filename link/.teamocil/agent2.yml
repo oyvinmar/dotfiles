@@ -1,0 +1,7 @@
+windows:
+  - name: agent2
+    root: ~/develop/ardoq/agent2-ardoq-packages
+    layout: even-horizontal
+    panes:
+      - clear
+      - git st

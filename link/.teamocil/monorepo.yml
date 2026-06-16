@@ -1,9 +1,4 @@
 windows:
-  - name: claude
-    root: ~/develop/ardoq/ardoq-packages
-    layout: even-horizontal
-    panes:
-      - claude
   - name: monorepo
     root: ~/develop/ardoq/ardoq-packages
     layout: even-horizontal

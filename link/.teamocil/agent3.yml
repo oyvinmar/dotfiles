@@ -1,0 +1,7 @@
+windows:
+  - name: agent3
+    root: ~/develop/ardoq/agent3-ardoq-packages
+    layout: even-horizontal
+    panes:
+      - clear
+      - git st
