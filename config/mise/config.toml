@@ -6,6 +6,7 @@ npm = "11.12.1"
 "npm:fkill-cli" = "latest"
 "npm:dockly" = "latest"
 "npm:agent-browser" = "latest"
+"npm:vercel" = "latest"
 
 pnpm = "10.29.2"
 
