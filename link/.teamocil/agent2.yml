@@ -1,6 +1,6 @@
 windows:
   - name: agent2
-    root: ~/develop/ardoq/agent2-ardoq-packages
+    root: ~/develop/ardoq/agent-2-ardoq-packages
     layout: even-horizontal
     panes:
       - clear
