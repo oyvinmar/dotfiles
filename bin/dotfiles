@@ -352,6 +352,19 @@ function config_do() {
   ln -sf ../${2#$HOME/} ~/.config/
 }
 
+# Link Claude Code config files.
+function claude_header() { e_header "Linking files into ~/.claude directory"; }
+function claude_dest() {
+  echo "$HOME/.claude/$base"
+}
+function claude_test() {
+  [[ "$1" -ef "$2" ]] && echo "same file"
+}
+function claude_do() {
+  e_success "Linking ~/.claude/$1."
+  ln -sf ../${2#$HOME/} ~/.claude/
+}
+
 # Copy, link, init, etc.
 function do_stuff() {
   local base dest skip
@@ -515,6 +528,9 @@ mkdir -p "$DOTFILES/caches/init"
 # Create .config dir, if it does'nt already exist
 mkdir -p "$HOME/.config"
 
+# Create .claude dir, if it doesn't already exist
+mkdir -p "$HOME/.claude"
+
 # If backups are needed, this is where they'll go.
 backup_dir="$DOTFILES/backups/$(date "+%Y_%m_%d-%H_%M_%S")/"
 backup=
@@ -523,6 +539,7 @@ backup=
 do_stuff copy
 do_stuff link
 do_stuff config
+do_stuff claude
 do_stuff init
 
 # Alert if backups were made.
