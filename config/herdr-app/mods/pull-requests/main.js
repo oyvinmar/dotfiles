@@ -1,44 +1,98 @@
 // @ts-check
-import { View, div } from "gpui-kit";
-import { v_flex, h_flex, Scrollbar } from "gpui-base";
-import { exec, theme, run } from "herdr";
+import { View, div, svg } from "gpui-kit";
+import { v_flex, h_flex, Editor, EditorState } from "gpui-base";
+import { exec, theme, run, props, settings, shared, setShared, openOverlay, closeOverlay } from "herdr";
 
 const POLL_MS = 30_000;
+/** Bumped by the merge dialog so the panel refreshes right away. */
+const MERGED_KEY = "pull-requests.merged";
 
-/** Collapse all checks into one rollup: success | failure | pending | null */
-function rollup(checks) {
-  if (!checks?.length) return null;
-  if (checks.some(c => c.status !== "COMPLETED")) return "pending";
-  if (checks.some(c => c.conclusion === "FAILURE" || c.conclusion === "TIMED_OUT" || c.conclusion === "CANCELLED")) return "failure";
-  if (checks.every(c => c.conclusion === "SUCCESS" || c.conclusion === "SKIPPED" || c.conclusion === "NEUTRAL")) return "success";
+const LINK = /\[[^\]]*\]\([^)]*\)/;
+const EMPTY_PLACEHOLDER = /^\s*(?:[-*]\s+)?(?:\*\*)?(?:Jira|Figma)(?:\*\*)?\s*:\s*(?:\*\*)?\s*$/i;
+
+/** The PR description as a squash commit body: without HTML comments and
+ *  the bot link under each (`<!-- Cloudflare preview -->` + `[Open preview](…)`),
+ *  and without `Jira:` / `Figma:` lines left empty. */
+function cleanBody(body) {
+  const text = (body ?? "").replace(/\r\n?/g, "\n").replace(/<!--[\s\S]*?-->/g, "\u0000");
+  const out = [];
+  // "wait": a comment-only line was dropped; "link": dropping the link paragraph under it.
+  let drop = null;
+  for (const raw of text.split("\n")) {
+    const line = raw.replace(/\u0000/g, "").trimEnd();
+    if (raw.includes("\u0000") && !line.trim()) { drop = "wait"; continue; }
+    if (drop) {
+      if (!line.trim()) { if (drop === "link") drop = null; out.push(""); continue; }
+      if (LINK.test(line)) { drop = "link"; continue; }
+      drop = null;
+    }
+    if (EMPTY_PLACEHOLDER.test(line)) continue;
+    out.push(line);
+  }
+  return out.join("\n").replace(/\n{3,}/g, "\n\n").trim();
+}
+
+const FAILED = new Set(["FAILURE", "TIMED_OUT", "CANCELLED", "STARTUP_FAILURE", "ACTION_REQUIRED", "ERROR"]);
+const PASSED = new Set(["SUCCESS", "SKIPPED", "NEUTRAL"]);
+
+/** One check's outcome: success | failure | pending.
+ *  CheckRun (Actions) has status + conclusion; StatusContext (commit
+ *  statuses, e.g. Chromatic) has only state. */
+function checkOutcome(c) {
+  const result = c.__typename === "StatusContext" ? c.state
+    : c.status === "COMPLETED" ? c.conclusion
+    : null;
+  if (FAILED.has(result)) return "failure";
+  if (PASSED.has(result)) return "success";
   return "pending";
 }
 
-function ciColor(status, t) {
-  if (status === "success") return t.done ?? "#22c55e";
-  if (status === "failure") return t.blocked ?? "#ef4444";
-  if (status === "pending") return t.working ?? "#f59e0b";
-  return t.dim;
+/** The failed checks, deduplicated, as { name, workflow, url } sorted by name. */
+function failedChecks(checks) {
+  const seen = new Map();
+  for (const c of checks ?? []) {
+    if (checkOutcome(c) !== "failure") continue;
+    const name = c.name ?? c.context ?? "Unnamed check";
+    const url = c.detailsUrl ?? c.targetUrl ?? null;
+    seen.set(`${name}\n${url}`, { name, workflow: c.workflowName ?? null, url });
+  }
+  return [...seen.values()].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
 }
 
-function ciLabel(status) {
-  if (status === "success") return "✓";
-  if (status === "failure") return "✗";
-  if (status === "pending") return "●";
-  return "–";
+/** Collapse all checks into one rollup: success | failure | pending | null.
+ *  A failure wins over checks still running, as on GitHub. */
+function rollup(checks) {
+  if (!checks?.length) return null;
+  const outcomes = checks.map(checkOutcome);
+  if (outcomes.includes("failure")) return "failure";
+  if (outcomes.includes("pending")) return "pending";
+  return "success";
+}
+
+function ciColor(status, t) {
+  if (status === "success") return t.ansi2;
+  if (status === "failure") return t.ansi1;
+  if (status === "pending") return t.ansi3;
+  return t.dim;
 }
 
 export default class PullRequests extends View {
   init(_props, cx) {
+    if (props()?.failed) return; // the checks popover: no polling
+    if (props()?.merge) return this.initMergeDialog(cx);
+    this.mergedSeen = shared(MERGED_KEY);
     this.prs = [];
     this.loading = true;
     this.error = null;
-    this.acting = {}; // prNumber -> true while a gh action is in flight
+    this.acting = {}; // action key -> true while a gh action is in flight
+    this.fetching = 0; // refreshes in flight; the refresh icon spins meanwhile
     cx.timer.every(POLL_MS, (cx) => this.refresh(cx));
     this.refresh(cx);
   }
 
   refresh(cx) {
+    this.fetching++;
+    cx.notify();
     cx.spawn(async (cx) => {
       try {
         // Step 1: list open PRs authored by me
@@ -57,7 +111,7 @@ export default class PullRequests extends View {
             const r = await exec("gh", [
               "pr", "view", String(pr.number),
               "--repo", pr.repository.nameWithOwner,
-              "--json", "number,title,url,isDraft,reviewDecision,statusCheckRollup",
+              "--json", "number,title,body,url,isDraft,reviewDecision,statusCheckRollup",
             ]);
             if (r.code !== 0) return { ...pr, reviewDecision: null, statusCheckRollup: [] };
             const d = JSON.parse(r.stdout);
@@ -73,6 +127,7 @@ export default class PullRequests extends View {
         this.error = e.message ?? String(e);
       } finally {
         this.loading = false;
+        this.fetching--;
         cx.notify();
       }
     });
@@ -88,61 +143,144 @@ export default class PullRequests extends View {
     }
   }
 
+  /** Merge dialog: the squash commit's description, editable, then `gh pr merge`. */
+  initMergeDialog(cx) {
+    const t = theme();
+    this.busy = false;
+    this.mergeError = null;
+    this.editor = EditorState.new({
+      language: "markdown", value: props().merge.body,
+      soft_wrap: true, line_numbers: false, folding: false,
+      font_family: /** @type {string | undefined} */ (settings().font_family),
+      syntax: { heading: t.ansi4, strong: t.foreground, code: t.ansi2, quote: t.dim, list: t.ansi5, link: t.ansi6 },
+    });
+    this.editor.on("submit", (_e, cx) => this.merge(cx));
+    this.editor.focus();
+    cx.timer.after(600, () => this.editor.focus()); // as the shipped prompt does, once the dialog has settled
+    this.handle = cx.focus_handle();
+  }
+
+  merge(cx) {
+    if (this.busy) return;
+    const { merge, overlay } = props();
+    this.busy = true;
+    this.mergeError = null;
+    cx.notify();
+    cx.spawn(async (cx) => {
+      try {
+        const r = await exec("gh", ["pr", "merge", String(merge.number), "--repo", merge.repo,
+          "--squash", "--auto", "--body", this.editor.value()]);
+        if (r.code !== 0) throw new Error((r.stderr || r.stdout || "gh pr merge failed").trim());
+        setShared(MERGED_KEY, Date.now());
+        closeOverlay(overlay);
+      } catch (e) {
+        this.mergeError = e.message ?? String(e);
+        this.busy = false;
+        cx.notify();
+      }
+    });
+  }
+
+  mergeKey(e, cx) {
+    if (e.keystroke === "escape" && !this.busy) { closeOverlay(props().overlay); cx.stop_propagation(); }
+    if (e.keystroke === "cmd-enter") { this.merge(cx); cx.stop_propagation(); }
+  }
+
+  mergeDialog(t) {
+    const { merge, overlay } = props();
+    const button = (id, text, primary, action) => h_flex().id(id).h(32).px(14).items_center().rounded(8)
+      .border_1().border_color(primary ? t.solid : t.input).bg(primary ? t.solid : t.raised)
+      .text_color(primary ? t.solid_foreground : t.foreground).text_size(12.5).font_medium()
+      .when(this.busy, el => el.opacity(0.6))
+      .when(!this.busy, el => el.cursor_pointer().hover(s => s.opacity(0.88)).on_click(action))
+      .child(text);
+    return v_flex().id("merge-root").track_focus(this.handle).on_key_down((e, cx) => this.mergeKey(e, cx))
+      .size_full().p(18).bg(t.popover).text_color(t.foreground)
+      .child(h_flex().items_center().gap(8)
+        .child(div().flex_1().text_size(15).font_semibold().child(`Squash and merge #${merge.number}`))
+        .child(div().text_size(11).text_color(t.dim).child("Esc")))
+      .child(div().pt(4).text_size(12.5).text_color(t.muted).truncate().child(merge.title))
+      .child(div().pt(16).pb(7).text_size(11.5).text_color(t.dim).child("Commit description"))
+      .child(v_flex().flex_1().min_h(0).p(10).rounded(9).border_1().border_color(t.input).bg(t.background)
+        .child(Editor.new(this.editor).text_size(13).flex_1().min_h(0)))
+      .when(Boolean(this.mergeError), el => el.child(
+        div().pt(8).text_size(12).text_color(t.ansi1).child(this.mergeError)))
+      .child(h_flex().pt(16).gap(8).items_center()
+        .child(div().flex_1().text_size(11.5).text_color(t.dim).child("Merges when required checks pass · ⌘↵"))
+        .child(button("merge-cancel", "Cancel", false, () => closeOverlay(overlay)))
+        .child(button("merge-confirm", this.busy ? "Merging…" : "Squash and merge", true,
+          (_e, cx) => this.merge(cx))));
+  }
+
+  /** Popover opened from a red dot: each failed check, linking to its run. */
+  checksPopover(t) {
+    const { failed, pr, overlay } = props();
+    return v_flex().id("checks-root").size_full().bg(t.popover)
+      .child(
+        h_flex().w_full().h(32).px(12).items_center().flex_none()
+          .border_b(1).border_color(t.border)
+          .text_size(12).font_semibold().text_color(t.foreground)
+          .child(`${failed.length} failing check${failed.length === 1 ? "" : "s"} · ${pr}`)
+      )
+      .child(
+        div().id("checks-scroll").flex_1().overflow_y_scrollbar().py(4).children(
+          failed.map((c, i) =>
+            h_flex().id(`check-${i}`).w_full().px(12).py(6).gap(8).items_center()
+              .when(Boolean(c.url), el => el.cursor_pointer()
+                .hover(s => s.bg(t.hover))
+                .on_click(() => { closeOverlay(overlay); exec("open", [c.url]); }))
+              .child(div().size(7).rounded(4).flex_none().bg(t.ansi1))
+              .child(
+                v_flex().flex_1().min_w(0)
+                  .child(div().truncate().text_size(13).text_color(t.foreground).child(c.name))
+                  .when(Boolean(c.workflow), el => el.child(
+                    div().truncate().text_size(11).text_color(t.dim).child(c.workflow)))
+              )
+              .child(div().flex_none().text_size(12).text_color(t.muted).child(c.url ? "↗" : ""))
+          )
+        )
+      );
+  }
+
   render(cx) {
     const t = theme();
-    const s = (n) => n * 1; // px passthrough
+    if (props()?.failed) return this.checksPopover(t);
+    if (props()?.merge) return this.mergeDialog(t);
 
-    const header = h_flex()
-      .w_full().h(36).px(14).items_center().justify_between()
-      .bg(t.chrome)
-      .child(div().text_size(13).font_semibold().text_color(t.foreground).child("Pull Requests"))
-      .child(
-        h_flex().gap(4)
-          .child(
-            div().id("pr-refresh").flex().w(22).h(22).rounded(4).items_center().justify_center()
-              .text_size(14).text_color(t.muted)
-              .hover(s => s.bg(t.hover).text_color(t.foreground))
-              .on_click((_e, cx) => { this.loading = true; cx.notify(); this.refresh(cx); })
-              .child("↻")
-          )
-          .child(
-            div().id("pr-close").flex().w(22).h(22).rounded(4).items_center().justify_center()
-              .text_size(14).text_color(t.muted)
-              .hover(s => s.bg(t.hover).text_color(t.foreground))
-              .on_click(() => run("layout.hide", { id: "prs" }))
-              .child("✕")
-          )
-      );
+    // The merge dialog bumped this: show the merge without waiting for the poll.
+    const merged = shared(MERGED_KEY);
+    if (merged !== this.mergedSeen) { this.mergedSeen = merged; this.refresh(cx); }
 
-    if (this.loading && !this.prs.length) {
-      return v_flex().size_full().bg(t.canvas)
-        .child(header)
-        .child(
-          v_flex().flex_1().items_center().justify_center()
-            .child(div().text_size(13).text_color(t.muted).child("Loading…"))
-        );
-    }
+    // Sized and styled like the terminal pane header (the `pane` mod at 30px).
+    const iconButton = (id, icon, tip, onClick, spinning = false) =>
+      div().id(id).flex_none().p(3).rounded(4)
+        .text_color(t.dim).cursor_pointer().hover(s => s.bg(t.hover).text_color(t.foreground))
+        .tooltip(tip).on_click(onClick)
+        .child(spinning ? svg(icon).size(14).spin(900) : svg(icon).size(14));
 
-    if (this.error) {
-      return v_flex().size_full().bg(t.canvas)
-        .child(header)
-        .child(
-          v_flex().flex_1().p(14).gap(6)
-            .child(div().text_size(13).text_color(t.blocked ?? "#ef4444").font_semibold().child("Error"))
-            .child(div().text_size(12).text_color(t.muted).child(this.error))
-        );
-    }
+    const header = h_flex().h(30).flex_none().px(10).gap(8).items_center()
+      .text_size(12)
+      .child(div().flex_none().font_medium().text_color(t.foreground).child("Pull requests"))
+      .child(div().flex_1().truncate().text_color(t.dim)
+        .child(this.prs.length > 0 ? `${this.prs.length} open` : ""))
+      .child(iconButton("pr-refresh", "mods/pull-requests/refresh.svg", "Refresh",
+        (_e, cx) => this.refresh(cx), this.fetching > 0))
+      .child(iconButton("pr-close", "mods/pane/close.svg", "Hide · ⌘⇧H",
+        () => run("layout.hide", { id: "prs" })));
 
-    if (!this.prs.length) {
-      return v_flex().size_full().bg(t.canvas)
-        .child(header)
-        .child(
-          v_flex().flex_1().items_center().justify_center()
-            .child(div().text_size(13).text_color(t.muted).child("No open PRs"))
-        );
-    }
+    const card = (body) => v_flex().id("pr-root").size_full().min_h(0)
+      .overflow_hidden().bg(t.background).border_l(1).border_color(t.border)
+      .text_color(t.foreground).text_size(13)
+      .child(header)
+      .child(body);
+    const notice = (title, detail) => v_flex().flex_1().p(20).gap(4).items_center().justify_center()
+      .child(div().text_size(12.5).text_color(t.muted).child(title))
+      .when(Boolean(detail), el => el.child(div().text_size(11.5).text_color(t.dim).child(detail)));
 
-    // Group by repo
+    if (this.loading && !this.prs.length) return card(notice("Loading pull requests…"));
+    if (this.error) return card(notice("Couldn't load pull requests", this.error));
+    if (!this.prs.length) return card(notice("No open pull requests"));
+
     const byRepo = new Map();
     for (const pr of this.prs) {
       const repo = pr.repository.nameWithOwner;
@@ -152,101 +290,107 @@ export default class PullRequests extends View {
 
     const rows = [];
     for (const [repo, prs] of byRepo) {
-      // Repo header
       rows.push(
-        div().id(`repo-${repo}`).w_full()
-          .px(14).py(6)
-          .text_size(11).font_semibold().text_color(t.dim)
-          .child(repo.split("/")[1].toUpperCase())
+        h_flex().id(`repo-${repo}`).px(8).pt(rows.length ? 14 : 6).pb(4).gap(6).items_center()
+          .text_size(11.5).font_medium().text_color(t.dim)
+          .child(div().truncate().child(repo.split("/")[1]))
+          .child(div().child(String(prs.length)))
       );
-
-      for (const pr of prs) {
-        const ci = rollup(pr.statusCheckRollup);
-        const isDraft = pr.isDraft;
-        const needsReview = !isDraft && pr.reviewDecision === "REVIEW_REQUIRED";
-        const approved = pr.reviewDecision === "APPROVED";
-
-        // Status badge text + color
-        let badge = null;
-        if (isDraft) {
-          badge = { label: "Draft", color: t.dim };
-        } else if (approved) {
-          badge = { label: "Approved", color: t.done ?? "#22c55e" };
-        } else if (needsReview) {
-          badge = { label: "Review", color: t.working ?? "#f59e0b" };
-        }
-
-        const actKey = `${pr.repository.nameWithOwner}#${pr.number}`;
-
-        // Action buttons row
-        const actions = h_flex().gap(4).mt(5).children([
-          // Open in browser
-          actionBtn("↗ Open", t, false, (_e, cx) => {
-            this.action(`open-${actKey}`, () => exec("open", [pr.url]), cx);
-          }),
-          // Ready for review (only for drafts)
-          isDraft
-            ? actionBtn("→ Ready", t, !!this.acting[`ready-${actKey}`], (_e, cx) => {
-                this.action(`ready-${actKey}`, () =>
-                  exec("gh", ["pr", "ready", String(pr.number), "--repo", pr.repository.nameWithOwner]), cx);
-              })
-            : null,
-          // Merge (only for non-draft, CI passed or no CI)
-          !isDraft
-            ? actionBtn("⤵ Merge", t, !!this.acting[`merge-${actKey}`], (_e, cx) => {
-                this.action(`merge-${actKey}`, () =>
-                  exec("gh", ["pr", "merge", String(pr.number), "--repo", pr.repository.nameWithOwner, "--squash", "--auto"]), cx);
-              })
-            : null,
-        ].filter(Boolean));
-
-        rows.push(
-          v_flex().id(`pr-${pr.number}-${repo}`).w_full()
-            .px(14).py(10)
-            .gap(0)
-            .border(1).border_color("#00000000")
-            .hover(s => s.bg(t.hover))
-            .child(
-              // Title row
-              h_flex().w_full().gap(6).items_start().flex_wrap().children([
-                // CI dot
-                div().w(14).h(14).mt(1).flex_shrink_0()
-                  .text_size(13).text_color(ciColor(ci, t))
-                  .child(ciLabel(ci)),
-                // Title
-                div().flex_1().min_w(0).text_size(14).text_color(t.foreground)
-                  .child(`#${pr.number} ${pr.title}`),
-              ])
-            )
-            .when(badge !== null, el => el.child(
-              h_flex().mt(4).ml(20)
-                .child(
-                  div().px(5).py(1).rounded(3)
-                    .text_size(11).font_semibold()
-                    .text_color(badge.color)
-                    .bg(t.surface)
-                    .child(badge.label)
-                )
-            ))
-            .child(div().ml(20).child(actions))
-        );
-      }
+      for (const pr of prs) rows.push(this.prRow(pr, repo, t));
     }
 
-    return v_flex().id("pr-root").size_full().bg(t.canvas)
-      .child(header)
-      .child(
-        div().id("pr-scroll").flex_1().overflow_y_scrollbar().children(rows)
-      );
+    return card(
+      v_flex().id("pr-list").flex_1().min_h(0).overflow_y_scrollbar().p(6).gap(2).children(rows)
+    );
+  }
+
+  prRow(pr, repo, t) {
+    const key = `${repo}#${pr.number}`;
+    const ci = rollup(pr.statusCheckRollup);
+    const review = pr.isDraft ? { label: "Draft", color: t.muted, neutral: true }
+      : REVIEW[pr.reviewDecision] ? { ...REVIEW[pr.reviewDecision], color: t[REVIEW[pr.reviewDecision].color] }
+      : null;
+    const failed = ci === "failure" ? failedChecks(pr.statusCheckRollup) : [];
+
+    const dot = div().id(`ci-${key}`).flex().size(16).mt(1).flex_none().items_center().justify_center()
+      .rounded(5).tooltip(ciTooltip(ci, failed.length))
+      .child(ci ? div().size(8).rounded(4).bg(ciColor(ci, t))
+        : div().w(8).h(2).rounded(1).bg(t.dim))
+      .when(ci === "failure", el => el.cursor_pointer().hover(s => s.bg(t.hover))
+        .on_click(() => openOverlay({
+          mod: "pull-requests", kind: "popup", width: 340,
+          // header + list padding + rows (two lines with a workflow name)
+          height: Math.min(33 + 8 + failed.reduce((h, c) => h + (c.workflow ? 52 : 36), 0), 420),
+          props: { failed, pr: `#${pr.number}` },
+        })));
+
+    const chip = review && div().flex().flex_none().h(18).px(6).items_center().rounded(5)
+      .bg(review.neutral ? t.hover : tint(review.color)).text_color(review.color)
+      .text_size(10.5).font_semibold().child(review.label);
+
+    const actions = [
+      actionButton(`open-${key}`, "Open", "open", t, {
+        onClick: () => exec("open", [pr.url]),
+      }),
+      pr.isDraft && actionButton(`ready-${key}`, "Ready", "ready", t, {
+        busy: !!this.acting[`ready-${key}`],
+        tooltip: "Mark ready for review",
+        onClick: (_e, cx) => this.action(`ready-${key}`, () =>
+          exec("gh", ["pr", "ready", String(pr.number), "--repo", repo]), cx),
+      }),
+      !pr.isDraft && pr.reviewDecision === "APPROVED" && actionButton(`merge-${key}`, "Merge", "merge", t, {
+        primary: true,
+        onClick: () => openOverlay({
+          mod: "pull-requests", kind: "dialog", modal: true, width: 640, height: 520,
+          props: { merge: { number: pr.number, repo, title: pr.title, body: cleanBody(pr.body) } },
+        }),
+      }),
+    ].filter(Boolean);
+
+    return h_flex().id(`pr-${key}`).w_full().px(8).py(9).gap(8).items_start().rounded(8)
+      .hover(s => s.bg(t.hover))
+      .child(dot)
+      .child(v_flex().flex_1().min_w(0).gap(6)
+        .child(div().text_size(13).font_medium().text_color(t.foreground).child(listTitle(pr.title)))
+        .child(h_flex().gap(6).items_center()
+          .child(div().text_size(11.5).text_color(t.dim).child(`#${pr.number}`))
+          .when(Boolean(chip), el => el.child(chip)))
+        .child(h_flex().gap(7).pt(1).children(actions)));
   }
 }
 
-function actionBtn(label, t, busy, onClick) {
-  return div().id(`btn-${label}`).px(7).py(3).rounded(4)
-    .text_size(12).font_semibold()
-    .text_color(busy ? t.dim : t.foreground)
-    .bg(t.surface)
-    .hover(s => s.bg(t.raised))
-    .on_click(onClick)
-    .child(busy ? "…" : label);
+/** The title as listed: without the repo's "[No Jira Issue]" prefix, which says nothing. */
+function listTitle(title) {
+  return title.replace(/^\s*\[no jira issue\]\s*/i, "") || title;
+}
+
+/** Review states worth a chip; the color is a theme color name. */
+const REVIEW = {
+  APPROVED: { label: "Approved", color: "ansi2" },
+  CHANGES_REQUESTED: { label: "Changes requested", color: "ansi1" },
+  REVIEW_REQUIRED: { label: "In review", color: "ansi3" },
+};
+
+/** A theme color (#rrggbb) at 15% for a chip's background. */
+function tint(color) {
+  return /^#[0-9a-f]{6}$/i.test(color) ? `${color}26` : color;
+}
+
+function ciTooltip(ci, failing) {
+  if (ci === "success") return "All checks passed";
+  if (ci === "failure") return `${failing} failing check${failing === 1 ? "" : "s"} · click to see them`;
+  if (ci === "pending") return "Checks running";
+  return "No checks";
+}
+
+/** A row button in the merge dialog's style, a size smaller. */
+function actionButton(id, label, icon, t, { primary = false, busy = false, tooltip = null, onClick }) {
+  return h_flex().id(id).h(22).px(7).gap(4).items_center().rounded(6)
+    .border_1().border_color(primary ? t.solid : t.input).bg(primary ? t.solid : t.raised)
+    .text_color(primary ? t.solid_foreground : t.foreground).text_size(11.5).font_medium()
+    .when(Boolean(tooltip), el => el.tooltip(tooltip))
+    .when(busy, el => el.opacity(0.6))
+    .when(!busy, el => el.cursor_pointer().hover(s => s.opacity(0.88)).on_click(onClick))
+    .child(svg(`mods/pull-requests/${icon}.svg`).size(11).flex_none())
+    .child(busy ? `${label}…` : label);
 }
