@@ -47,10 +47,26 @@ function checkOutcome(c) {
   return "pending";
 }
 
+/** Only the newest run of each check (workflow + name), as GitHub counts them:
+ *  a workflow re-triggered by e.g. adding a label leaves its superseded,
+ *  possibly failed, run in the rollup. A run not yet started is the newest. */
+function latestChecks(checks) {
+  const started = (c) => c.__typename === "StatusContext"
+    ? Date.parse(c.startedAt ?? c.createdAt ?? "") || 0
+    : c.startedAt ? Date.parse(c.startedAt) || 0 : Infinity;
+  const latest = new Map();
+  for (const c of checks ?? []) {
+    const key = `${c.workflowName ?? ""}\n${c.name ?? c.context ?? ""}`;
+    const prev = latest.get(key);
+    if (!prev || started(c) >= started(prev)) latest.set(key, c);
+  }
+  return [...latest.values()];
+}
+
 /** The failed checks, deduplicated, as { name, workflow, url } sorted by name. */
 function failedChecks(checks) {
   const seen = new Map();
-  for (const c of checks ?? []) {
+  for (const c of latestChecks(checks)) {
     if (checkOutcome(c) !== "failure") continue;
     const name = c.name ?? c.context ?? "Unnamed check";
     const url = c.detailsUrl ?? c.targetUrl ?? null;
@@ -63,7 +79,7 @@ function failedChecks(checks) {
  *  A failure wins over checks still running, as on GitHub. */
 function rollup(checks) {
   if (!checks?.length) return null;
-  const outcomes = checks.map(checkOutcome);
+  const outcomes = latestChecks(checks).map(checkOutcome);
   if (outcomes.includes("failure")) return "failure";
   if (outcomes.includes("pending")) return "pending";
   return "success";
@@ -249,7 +265,11 @@ export default class PullRequests extends View {
 
     // The merge dialog bumped this: show the merge without waiting for the poll.
     const merged = shared(MERGED_KEY);
-    if (merged !== this.mergedSeen) { this.mergedSeen = merged; this.refresh(cx); }
+    // refresh() notifies, which is illegal during render: defer it to a timer task.
+    if (merged !== this.mergedSeen) {
+      this.mergedSeen = merged;
+      cx.timer.after(0, (cx) => this.refresh(cx));
+    }
 
     // Sized and styled like the terminal pane header (the `pane` mod at 30px).
     const iconButton = (id, icon, tip, onClick, spinning = false) =>
