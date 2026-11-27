@@ -6,6 +6,75 @@ import { exec, theme, run, props, settings, shared, setShared, openOverlay, clos
 const POLL_MS = 30_000;
 /** Bumped by the merge dialog so the panel refreshes right away. */
 const MERGED_KEY = "pull-requests.merged";
+/** GitHub's refusal to merge a stacked PR through GraphQL (`gh pr merge`). */
+const STACKED = /part of a stack|asynchronous merge/i;
+
+/**
+ * Squash-merges through the async REST API, the only way to merge a stacked PR
+ * (it merges the open PRs below it in the stack too). It has no auto-merge, so
+ * this waits for GitHub to merge or enqueue it and throws if that fails.
+ */
+async function mergeAsync(repo, number, body, cx) {
+  const path = `repos/${repo}/pulls/${number}/merge-async`;
+  const api = async (args) => {
+    const r = await exec("gh", ["api", ...args]);
+    let json = null;
+    try { json = JSON.parse(r.stdout); } catch { /* not JSON: reported below */ }
+    // 409: a merge is already pending; its body describes that one.
+    if (r.code !== 0 && json?.details?.uuid == null) {
+      throw new Error(json?.message ?? (r.stderr || r.stdout || "merge-async failed").trim());
+    }
+    return json;
+  };
+  let res = await api(["-X", "PUT", path, "-f", "merge_method=squash", "-f", `commit_message=${body}`]);
+  const uuid = res?.details?.uuid;
+  for (let i = 0; res?.status === "pending" && uuid && i < 40; i++) {
+    await cx.sleep(1500);
+    res = await api([`${path}/${uuid}`]);
+  }
+  if (res?.status === "failed") throw new Error(res.details?.message ?? "GitHub could not merge the stack");
+}
+
+/**
+ * Each PR's place in a GitHub stack, in one GraphQL call (`gh pr view` has no
+ * stack field): `{ position, size, below }` or null, in the order of `prs`.
+ * `below` is the open PRs under it, which merging it merges too. Never throws:
+ * without stacks the list still shows, and merging falls back on GitHub's error.
+ */
+async function fetchStacks(prs) {
+  if (!prs.length) return [];
+  const fields = prs.map((pr, i) => {
+    const [owner, name] = pr.repository.nameWithOwner.split("/");
+    return `p${i}: repository(owner: ${JSON.stringify(owner)}, name: ${JSON.stringify(name)}) {
+      pullRequest(number: ${Number(pr.number)}) {
+        stackEntry { position }
+        stack { size entries(first: 50) { nodes { position pullRequest { number title state } } } }
+      }
+    }`;
+  });
+  try {
+    const r = await exec("gh", ["api", "graphql", "-f", `query={ ${fields.join("\n")} }`]);
+    const data = JSON.parse(r.stdout)?.data ?? {};
+    return prs.map((_pr, i) => {
+      const pr = data[`p${i}`]?.pullRequest;
+      const position = pr?.stackEntry?.position;
+      if (!pr?.stack || position == null) return null;
+      const below = (pr.stack.entries?.nodes ?? [])
+        .filter(e => e.position < position && e.pullRequest?.state === "OPEN")
+        .sort((a, b) => a.position - b.position)
+        .map(e => ({ number: e.pullRequest.number, title: e.pullRequest.title }));
+      return { position, size: pr.stack.size, below };
+    });
+  } catch {
+    return [];
+  }
+}
+
+function stackTooltip(stack) {
+  const place = `${stack.position} of ${stack.size} in a stack`;
+  if (!stack.below.length) return `${place} · nothing open below it`;
+  return `${place} · merging also merges ${stack.below.map(b => `#${b.number}`).join(", ")}`;
+}
 
 const LINK = /\[[^\]]*\]\([^)]*\)/;
 const EMPTY_PLACEHOLDER = /^\s*(?:[-*]\s+)?(?:\*\*)?(?:Jira|Figma)(?:\*\*)?\s*:\s*(?:\*\*)?\s*$/i;
@@ -121,7 +190,8 @@ export default class PullRequests extends View {
         if (listResult.code !== 0) throw new Error(listResult.stderr || "gh search failed");
         const list = JSON.parse(listResult.stdout);
 
-        // Step 2: fetch CI + reviewDecision per PR in parallel
+        // Step 2: fetch CI + reviewDecision per PR in parallel, and all stacks at once
+        const stacks = fetchStacks(list);
         const details = await Promise.all(list.map(async (pr) => {
           try {
             const r = await exec("gh", [
@@ -137,7 +207,8 @@ export default class PullRequests extends View {
           }
         }));
 
-        this.prs = details;
+        const stackOf = await stacks;
+        this.prs = details.map((pr, i) => ({ ...pr, stack: stackOf[i] ?? null }));
         this.error = null;
       } catch (e) {
         this.error = e.message ?? String(e);
@@ -159,7 +230,8 @@ export default class PullRequests extends View {
     }
   }
 
-  /** Merge dialog: the squash commit's description, editable, then `gh pr merge`. */
+  /** Merge dialog: the squash commit's description, editable, then `gh pr merge`
+   *  (the async merge API for a stacked PR). */
   initMergeDialog(cx) {
     const t = theme();
     this.busy = false;
@@ -184,9 +256,19 @@ export default class PullRequests extends View {
     cx.notify();
     cx.spawn(async (cx) => {
       try {
-        const r = await exec("gh", ["pr", "merge", String(merge.number), "--repo", merge.repo,
-          "--squash", "--auto", "--body", this.editor.value()]);
-        if (r.code !== 0) throw new Error((r.stderr || r.stdout || "gh pr merge failed").trim());
+        const body = this.editor.value();
+        if (merge.stack) {
+          await mergeAsync(merge.repo, merge.number, body, cx);
+        } else {
+          const r = await exec("gh", ["pr", "merge", String(merge.number), "--repo", merge.repo,
+            "--squash", "--auto", "--body", body]);
+          if (r.code !== 0) {
+            const message = (r.stderr || r.stdout || "gh pr merge failed").trim();
+            // Stacked since the last refresh, or its stack couldn't be fetched.
+            if (!STACKED.test(message)) throw new Error(message);
+            await mergeAsync(merge.repo, merge.number, body, cx);
+          }
+        }
         setShared(MERGED_KEY, Date.now());
         closeOverlay(overlay);
       } catch (e) {
@@ -204,6 +286,7 @@ export default class PullRequests extends View {
 
   mergeDialog(t) {
     const { merge, overlay } = props();
+    const below = merge.stack?.below ?? [];
     const button = (id, text, primary, action) => h_flex().id(id).h(32).px(14).items_center().rounded(8)
       .border_1().border_color(primary ? t.solid : t.input).bg(primary ? t.solid : t.raised)
       .text_color(primary ? t.solid_foreground : t.foreground).text_size(12.5).font_medium()
@@ -216,15 +299,25 @@ export default class PullRequests extends View {
         .child(div().flex_1().text_size(15).font_semibold().child(`Squash and merge #${merge.number}`))
         .child(div().text_size(11).text_color(t.dim).child("Esc")))
       .child(div().pt(4).text_size(12.5).text_color(t.muted).truncate().child(merge.title))
+      .when(below.length > 0, el => el.child(v_flex().mt(14).px(10).py(8).gap(4).rounded(8)
+        .border_1().border_color(t.border).bg(t.raised).text_size(12)
+        .child(div().text_color(t.ansi3).font_medium()
+          .child(`Also merges ${below.length === 1 ? "the PR" : `${below.length} PRs`} below it in the stack`))
+        .children(below.map(b => h_flex().gap(6).min_w(0)
+          .child(div().flex_none().text_color(t.dim).child(`#${b.number}`))
+          .child(div().truncate().text_color(t.muted).child(listTitle(b.title)))))))
       .child(div().pt(16).pb(7).text_size(11.5).text_color(t.dim).child("Commit description"))
       .child(v_flex().flex_1().min_h(0).p(10).rounded(9).border_1().border_color(t.input).bg(t.background)
         .child(Editor.new(this.editor).text_size(13).flex_1().min_h(0)))
       .when(Boolean(this.mergeError), el => el.child(
         div().pt(8).text_size(12).text_color(t.ansi1).child(this.mergeError)))
       .child(h_flex().pt(16).gap(8).items_center()
-        .child(div().flex_1().text_size(11.5).text_color(t.dim).child("Merges when required checks pass · ⌘↵"))
+        .child(div().flex_1().text_size(11.5).text_color(t.dim).child(merge.stack
+          ? "Stacked: no auto-merge, merges now · ⌘↵"
+          : "Merges when required checks pass · ⌘↵"))
         .child(button("merge-cancel", "Cancel", false, () => closeOverlay(overlay)))
-        .child(button("merge-confirm", this.busy ? "Merging…" : "Squash and merge", true,
+        .child(button("merge-confirm", this.busy ? "Merging…"
+          : below.length ? `Squash and merge ${below.length + 1} PRs` : "Squash and merge", true,
           (_e, cx) => this.merge(cx))));
   }
 
@@ -348,6 +441,11 @@ export default class PullRequests extends View {
       .bg(review.neutral ? t.hover : tint(review.color)).text_color(review.color)
       .text_size(10.5).font_semibold().child(review.label);
 
+    const stackChip = pr.stack && div().id(`stack-${key}`).flex().flex_none().h(18).px(6).items_center()
+      .rounded(5).bg(t.hover).text_color(pr.stack.below.length ? t.ansi3 : t.muted)
+      .text_size(10.5).font_semibold().tooltip(stackTooltip(pr.stack))
+      .child(`Stack ${pr.stack.position}/${pr.stack.size}`);
+
     const actions = [
       actionButton(`open-${key}`, "Open", "open", t, {
         onClick: () => exec("open", [pr.url]),
@@ -361,8 +459,10 @@ export default class PullRequests extends View {
       !pr.isDraft && pr.reviewDecision === "APPROVED" && actionButton(`merge-${key}`, "Merge", "merge", t, {
         primary: true,
         onClick: () => openOverlay({
-          mod: "pull-requests", kind: "dialog", modal: true, width: 640, height: 520,
-          props: { merge: { number: pr.number, repo, title: pr.title, body: cleanBody(pr.body) } },
+          mod: "pull-requests", kind: "dialog", modal: true, width: 640,
+          // room for the stacked PRs that merge along with it
+          height: 520 + (pr.stack?.below.length ? Math.min(46 + 20 * pr.stack.below.length, 160) : 0),
+          props: { merge: { number: pr.number, repo, title: pr.title, body: cleanBody(pr.body), stack: pr.stack } },
         }),
       }),
     ].filter(Boolean);
@@ -374,7 +474,8 @@ export default class PullRequests extends View {
         .child(div().text_size(13).font_medium().text_color(t.foreground).child(listTitle(pr.title)))
         .child(h_flex().gap(6).items_center()
           .child(div().text_size(11.5).text_color(t.dim).child(`#${pr.number}`))
-          .when(Boolean(chip), el => el.child(chip)))
+          .when(Boolean(chip), el => el.child(chip))
+          .when(Boolean(stackChip), el => el.child(stackChip)))
         .child(h_flex().gap(7).pt(1).children(actions)));
   }
 }
